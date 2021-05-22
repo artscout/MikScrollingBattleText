@@ -25,7 +25,7 @@ local GetItemInfo = GetItemInfo
 local GetItemCount = GetItemCount
 local DisplayEvent = MikSBT.Animations.DisplayEvent
 
-local IsClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE
+local IsClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
 
 -------------------------------------------------------------------------------
@@ -83,38 +83,36 @@ local function HandleCurrency(parserEvent)
 	-- Get information about the looted currency.
 	local itemLink = parserEvent.itemLink
 	local itemName, numAmount, itemTexture, totalMax, itemQuality
-        if itemLink then
-	    if IsClassic then
-	            local _
-		    itemName, numAmount, itemTexture, _, _, totalMax, _, itemQuality = GetCurrencyInfo(itemLink)
-	    else
-		    local currency = C_CurrencyInfo.GetCurrencyInfoFromLink(itemLink)
-		    itemName, numAmount, itemTexture, totalMax, itemQuality = currency.name, currency.quantity, currency.iconFileID, currency.maxQuantity, currency.quality
-	    end
+	if IsClassic then
+		local _
+		itemName, numAmount, itemTexture, _, _, totalMax, _, itemQuality = GetCurrencyInfo(itemLink)
+	else
+		local currency = C_CurrencyInfo.GetCurrencyInfoFromLink(itemLink)
+		itemName, numAmount, itemTexture, totalMax, itemQuality = currency.name, currency.quantity, currency.iconFileID, currency.maxQuantity, currency.quality
+	end
 
-	    -- Determine whether to show the event and ignore it if necessary.
-	    local currentProfile = MSBTProfiles.currentProfile
-	    local showEvent = true
-	    if (currentProfile.itemExclusions[itemName]) then showEvent = false end
-	    if (currentProfile.itemsAllowed[itemName]) then showEvent = true end
-	    if (not showEvent) then return end
+	-- Determine whether to show the event and ignore it if necessary.
+	local currentProfile = MSBTProfiles.currentProfile
+	local showEvent = true
+	if (currentProfile.itemExclusions[itemName]) then showEvent = false end
+	if (currentProfile.itemsAllowed[itemName]) then showEvent = true end
+	if (not showEvent) then return end
 
-	    -- Format the item name according to its quality.
-	    local qualityColor = ITEM_QUALITY_COLORS[itemQuality]
-	    if (qualityPatterns[itemQuality]) then itemName = string_format (qualityPatterns[itemQuality], itemName) end
+	-- Format the item name according to its quality.
+	local qualityColor = ITEM_QUALITY_COLORS[itemQuality]
+	if (qualityPatterns[itemQuality]) then itemName = string_format (qualityPatterns[itemQuality], itemName) end
 
-	    local numLooted = parserEvent.amount or 1
+	local numLooted = parserEvent.amount or 1
 
-	    -- Format the event and display it.
-	    local eventSettings = MSBTProfiles.currentProfile.events.NOTIFICATION_CURRENCY
-	    if (eventSettings and not eventSettings.disabled) then
-		    local message = eventSettings.message
-			    message = string_gsub(message, "%%e", itemName)
-			    message = string_gsub(message, "%%a", numLooted)
-			    message = string_gsub(message, "%%t", numAmount)
-			    DisplayEvent(eventSettings, message, itemTexture)
-		    end
-        end
+	-- Format the event and display it.
+	local eventSettings = MSBTProfiles.currentProfile.events.NOTIFICATION_CURRENCY
+	if (eventSettings and not eventSettings.disabled) then
+		local message = eventSettings.message
+			message = string_gsub(message, "%%e", itemName)
+			message = string_gsub(message, "%%a", numLooted)
+			message = string_gsub(message, "%%t", numAmount)
+			DisplayEvent(eventSettings, message, itemTexture)
+		end
 end
 
 
@@ -145,9 +143,8 @@ local function HandleItems(parserEvent)
 	-- Get the number of items already existing in inventory and add the amount
 	-- looted to it if the item wasn't the result of a conjure.
 	local numLooted = parserEvent.amount or 1
-	local numItems = GetItemCount(itemLink)
-        if (numItems == 0) then numItems = numLooted end
-	local numTotal = numItems
+	local numItems = GetItemCount(itemLink) or 0
+	local numTotal = numItems + numLooted
 
 	-- Format the event and display it.
 	local eventSettings = MSBTProfiles.currentProfile.events.NOTIFICATION_LOOT
