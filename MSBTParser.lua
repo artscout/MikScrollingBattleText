@@ -888,7 +888,7 @@ local function Enable()
 	-- Register additional events for unit and class map processing.
 	eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 	eventFrame:RegisterEvent("UNIT_PET")
-	if WOW_PROJECT_ID < WOW_PROJECT_CLASSIC then
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 		eventFrame:RegisterEvent("ARENA_OPPONENT_UPDATE")
 	end
 	eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
