@@ -154,7 +154,20 @@ local function HandleItems(parserEvent)
 	-- Get the number of items already existing in inventory and add the amount
 	-- looted to it if the item wasn't the result of a conjure.
 	local numLooted = parserEvent.amount or 1
-	local numItems = GetItemCount(itemLink)
+	local numItems = 0
+	for bag = 0, NUM_BAG_SLOTS do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local bagItem = GetContainerItemLink(bag, slot)
+			if bagItem then
+				local bagItemLink = select(2, GetItemInfo(bagItem))
+				if bagItemLink == itemLink then
+					local bagItemCount = select(2, GetContainerItemInfo(bag, slot))
+					numItems = numItems + bagItemCount
+				end
+			end
+		end
+	end
+	
 	if (numItems == 0) then
 	    numItems = numLooted
 	else
