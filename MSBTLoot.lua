@@ -27,7 +27,6 @@ local DisplayEvent = MikSBT.Animations.DisplayEvent
 
 local IsClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
-
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
@@ -127,6 +126,42 @@ local function HandleCurrency(parserEvent)
 end
 
 
+local function loot_wait(itemLink, itemName, itemTexture, numLooted)
+	local numItems = 0
+	for bag = 0, NUM_BAG_SLOTS do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local bagItem = GetContainerItemLink(bag, slot)
+			if bagItem then
+				local bagItemLink = select(2, GetItemInfo(bagItem))
+				if bagItemLink == itemLink then
+					local bagItemCount = select(2, GetContainerItemInfo(bag, slot))
+					numItems = numItems + bagItemCount
+				end
+			end
+		end
+	end
+	
+	if (numItems == 0) then
+	    numItems = numLooted
+	end
+
+	local numTotal = numItems
+	if numItems <= 0 then
+		numTotal = numLooted
+	end
+
+	-- Format the event and display it.
+	local eventSettings = MSBTProfiles.currentProfile.events.NOTIFICATION_LOOT
+	if (eventSettings and not eventSettings.disabled) then
+		local message = eventSettings.message
+		message = string_gsub(message, "%%e", itemName)
+		message = string_gsub(message, "%%a", numLooted)
+		message = string_gsub(message, "%%t", numTotal)
+		DisplayEvent(eventSettings, message, itemTexture)
+	end
+
+end
+
 -- ****************************************************************************
 -- Handles looted items.
 -- ****************************************************************************
@@ -154,36 +189,7 @@ local function HandleItems(parserEvent)
 	-- Get the number of items already existing in inventory and add the amount
 	-- looted to it if the item wasn't the result of a conjure.
 	local numLooted = parserEvent.amount or 1
-	local numItems = 0
-	for bag = 0, NUM_BAG_SLOTS do
-		for slot = 1, GetContainerNumSlots(bag) do
-			local bagItem = GetContainerItemLink(bag, slot)
-			if bagItem then
-				local bagItemLink = select(2, GetItemInfo(bagItem))
-				if bagItemLink == itemLink then
-					local bagItemCount = select(2, GetContainerItemInfo(bag, slot))
-					numItems = numItems + bagItemCount
-				end
-			end
-		end
-	end
-	
-	if (numItems == 0) then
-	    numItems = numLooted
-	else
-            numItems = numItems + numLooted
-	end
-	local numTotal = numItems 
-
-	-- Format the event and display it.
-	local eventSettings = MSBTProfiles.currentProfile.events.NOTIFICATION_LOOT
-	if (eventSettings and not eventSettings.disabled) then
-		local message = eventSettings.message
-		message = string_gsub(message, "%%e", itemName)
-		message = string_gsub(message, "%%a", numLooted)
-		message = string_gsub(message, "%%t", numTotal)
-		DisplayEvent(eventSettings, message, itemTexture)
-	end
+	C_Timer.After(0.5, function() loot_wait(itemLink, itemName, itemTexture, numLooted)  end)
 end
 
 
