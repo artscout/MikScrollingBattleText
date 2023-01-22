@@ -127,7 +127,7 @@ end
 
 
 local function loot_wait(itemLink, itemName, itemTexture, numLooted)
-	local numItems = 0
+--[[	local numItems = 0
 	for bag = 0, NUM_BAG_SLOTS do
 		for slot = 1, GetContainerNumSlots(bag) do
 			local bagItem = GetContainerItemLink(bag, slot)
@@ -140,15 +140,14 @@ local function loot_wait(itemLink, itemName, itemTexture, numLooted)
 			end
 		end
 	end
+]]--
+	local numItems = GetItemCount(itemLink)
 	
 	if (numItems == 0) then
 	    numItems = numLooted
 	end
 
 	local numTotal = numItems
-	if numItems <= 0 then
-		numTotal = numLooted
-	end
 
 	-- Format the event and display it.
 	local eventSettings = MSBTProfiles.currentProfile.events.NOTIFICATION_LOOT
@@ -189,7 +188,9 @@ local function HandleItems(parserEvent)
 	-- Get the number of items already existing in inventory and add the amount
 	-- looted to it if the item wasn't the result of a conjure.
 	local numLooted = parserEvent.amount or 1
-	C_Timer.After(0.5, function() loot_wait(itemLink, itemName, itemTexture, numLooted)  end)
+	local lootProcessDelay = 0.15
+	if (currentProfile.lootProcessDelay) then lootProcessDelay = currentProfile.lootProcessDelay end
+	C_Timer.After(lootProcessDelay, function() loot_wait(itemLink, itemName, itemTexture, numLooted)  end)
 end
 
 

@@ -28,7 +28,6 @@ local GetSkillName = MikSBT.GetSkillName
 local DisplayEvent = MikSBT.Animations.DisplayEvent
 local HandleCooldowns = MSBTTriggers.HandleCooldowns
 
-
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
@@ -230,9 +229,9 @@ local function OnUpdate(frame, elapsed)
 		local currentTime = GetTime()
 		for cooldownID, usedTime in pairs(watchItemIDs) do
 			if (currentTime >= (usedTime + 1)) then
-	lastCooldownIDs["item"] = cooldownID
-				OnUpdateCooldown("item", GetItemCooldown)
-	watchItemIDs[cooldownID] = nil
+	                        lastCooldownIDs["item"] = cooldownID
+				OnUpdateCooldown("item", C_Container.GetItemCooldown)
+                                watchItemIDs[cooldownID] = nil
 				break
 			end
 		end
@@ -240,7 +239,7 @@ local function OnUpdate(frame, elapsed)
 		-- Loop through all of the active cooldowns.
 		local currentTime = GetTime()
 		for cooldownType, cooldowns in pairs(activeCooldowns) do
-			local cooldownFunc = (cooldownType == "item") and GetItemCooldown or GetSpellCooldown
+			local cooldownFunc = (cooldownType == "item") and C_Container.GetItemCooldown or GetSpellCooldown
 			local infoFunc = (cooldownType == "item") and GetItemInfo or GetSpellInfo
 			for cooldownID, remainingDuration in pairs(cooldowns) do
 				-- Ensure the cooldown is still valid.
@@ -426,7 +425,7 @@ local function UseContainerItemHook(bag, slot)
 	if (not itemCooldownsEnabled) then return end
 
 	-- Get item id for the used bag and slot.
-	local itemID = GetContainerItemID(bag, slot)
+	local itemID = C_Container.GetContainerItemID(bag, slot)
 	if (itemID) then OnItemUse(itemID) end
 end
 
@@ -461,7 +460,7 @@ _, playerClass = UnitClass("player")
 -- Setup hooks.
 hooksecurefunc("UseAction", UseActionHook)
 hooksecurefunc("UseInventoryItem", UseInventoryItemHook)
-hooksecurefunc("UseContainerItem", UseContainerItemHook)
+hooksecurefunc(C_Container, "UseContainerItem", UseContainerItemHook)
 hooksecurefunc("UseItemByName", UseItemByNameHook)
 
 -- Specify the abilities that reset cooldowns.
