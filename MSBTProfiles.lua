@@ -51,65 +51,65 @@ local REACTION_HOSTILE			= 0x00000040
 
 -- Spell IDs.
 --local SPELLID_BERSERK			= 93622
-local SPELLID_ELUSIVE_BREW		= 126453 -- Activated ability
+--local SPELLID_ELUSIVE_BREW		= 126453 -- Activated ability
 local SPELLID_EXECUTE			= 5308
 local SPELLID_FIRST_AID			= 3273
-local SPELLID_HAMMER_OF_WRATH	= 24275
---local SPELLID_KILL_SHOT		= 53351
-local SPELLID_LAVA_SURGE		= not IsClassic and 77762
+local SPELLID_HAMMER_OF_WRATH		= 24275
+local SPELLID_KILL_SHOT			= 53351
+--local SPELLID_LAVA_SURGE		= not IsClassic and 77762
 local SPELLID_REVENGE			= 6572
-local SPELLID_VICTORY_RUSH		= not IsClassic and 34428
+local SPELLID_VICTORY_RUSH		= 34428
 --local SPELLID_SHADOW_ORB		= 77487
 
 -- Trigger spell names.
 --local SPELL_BERSERK				= GetSkillName(SPELLID_BERSERK)
 --local SPELL_BLINDSIDE				= GetSkillName(121153)
 --local SPELL_BLOODSURGE			= GetSkillName(46916)
---local SPELL_BRAIN_FREEZE			= GetSkillName(44549)
---local SPELL_BF_FIREBALL			= GetSkillName(57761)
+local SPELL_BRAIN_FREEZE			= GetSkillName(44549)
+local SPELL_BF_FIREBALL				= GetSkillName(57761)
 local SPELL_CLEARCASTING			= GetSkillName(16870)
 --local SPELL_DECIMATION			= GetSkillName(108869)
-local SPELL_ELUSIVE_BREW			= not IsClassic and GetSkillName(128939)
-local SPELL_EXECUTE					= GetSkillName(SPELLID_EXECUTE)
-local SPELL_FINGERS_OF_FROST		= not IsClassic and GetSkillName(112965)
-local SPELL_FREEZING_FOG			= not IsClassic and GetSkillName(59052)
+--local SPELL_ELUSIVE_BREW			= not IsClassic and GetSkillName(128939)
+local SPELL_EXECUTE				= GetSkillName(SPELLID_EXECUTE)
+local SPELL_FINGERS_OF_FROST			= GetSkillName(44544)
+local SPELL_FREEZING_FOG			= GetSkillName(59052)
 local SPELL_HAMMER_OF_WRATH			= GetSkillName(SPELLID_HAMMER_OF_WRATH)
---local SPELL_KILL_SHOT				= GetSkillName(SPELLID_KILL_SHOT)
-local SPELL_KILLING_MACHINE			= not IsClassic and GetSkillName(51124)
-local SPELL_LAVA_SURGE				= not IsClassic and GetSkillName(SPELLID_LAVA_SURGE)
+local SPELL_KILL_SHOT				= GetSkillName(SPELLID_KILL_SHOT)
+local SPELL_KILLING_MACHINE			= GetSkillName(51124)
+--local SPELL_LAVA_SURGE			= not IsClassic and GetSkillName(SPELLID_LAVA_SURGE)
 --local SPELL_LOCK_AND_LOAD			= GetSkillName(168980)
---local SPELL_MAELSTROM_WEAPON		= GetSkillName(53817)
+local SPELL_MAELSTROM_WEAPON			= GetSkillName(53817)
 --local SPELL_MANA_TEA				= GetSkillName(115867)
-local SPELL_MISSILE_BARRAGE			= not IsClassic and GetSkillName(62401)
+local SPELL_MISSILE_BARRAGE			= GetSkillName(62401)
 --local SPELL_MOLTEN_CORE			= GetSkillName(122351)
 --local SPELL_NIGHTFALL				= GetSkillName(108558)
-local SPELL_PREDATORS_SWIFTNESS		= not IsClassic and GetSkillName(69369)
-local SPELL_PVP_TRINKET				= not IsClassic and GetSkillName(42292)
-local SPELL_REVENGE					= GetSkillName(SPELLID_REVENGE)
-local SPELL_RIME 					= not IsClassic and GetSkillName(59057)
+local SPELL_PREDATORS_SWIFTNESS			= GetSkillName(69369)
+local SPELL_PVP_TRINKET				= GetSkillName(42292)
+local SPELL_REVENGE				= GetSkillName(SPELLID_REVENGE)
+local SPELL_RIME 				= GetSkillName(59057)
 local SPELL_SHADOW_TRANCE			= GetSkillName(17941)
 local SPELL_SHIELD_SLAM				= GetSkillName(23922)
 --local SPELL_SHADOW_INFUSION		= GetSkillName(91342)
 --local SPELL_SHADOW_ORB			= GetSkillName(SPELLID_SHADOW_ORB)
 --local SPELL_SHOOTING_STARS		= GetSkillName(93400)
-local SPELL_SUDDEN_DEATH			= not IsClassic and GetSkillName(52437)
-local SPELL_SUDDEN_DOOM				= not IsClassic and GetSkillName(81340)	-- XXX: No trigger atm - DK
---local SPELL_SWORD_AND_BOARD		= GetSkillName(50227)
---local SPELL_TASTE_FOR_BLOOD		= GetSkillName(56636)
---local SPELL_THE_ART_OF_WAR		= GetSkillName(59578)
-local SPELL_TIDAL_WAVES				= not IsClassic and GetSkillName(53390)
+local SPELL_SUDDEN_DEATH			= GetSkillName(52437)
+--local SPELL_SUDDEN_DOOM				= not IsClassic and GetSkillName(81340)	-- XXX: No trigger atm - DK
+local SPELL_SWORD_AND_BOARD			= GetSkillName(50227)
+local SPELL_TASTE_FOR_BLOOD			= GetSkillName(56636)
+local SPELL_THE_ART_OF_WAR			= GetSkillName(59578)
+local SPELL_TIDAL_WAVES				= GetSkillName(53390)
 --local SPELL_ULTIMATUM				= GetSkillName(122510)
-local SPELL_VICTORY_RUSH			= not IsClassic and GetSkillName(SPELLID_VICTORY_RUSH)  -- XXX: Update for buff
+local SPELL_VICTORY_RUSH			= GetSkillName(SPELLID_VICTORY_RUSH)  -- XXX: Update for buff
 --local SPELL_VITAL_MISTS			= GetSkillName(122107)
 
 -- Throttle, suppression, and other spell names.
 --local SPELL_BLOOD_PRESENCE		= GetSkillName(48266)
-local SPELL_DRAIN_LIFE				= not IsClassic and GetSkillName(234153)
-local SPELL_SHADOWMEND				= not IsClassic and GetSkillName(39373)
+--local SPELL_DRAIN_LIFE				= not IsClassic and GetSkillName(234153)
+local SPELL_SHADOWMEND				= GetSkillName(39373)
 --local SPELL_REFLECTIVE_SHIELD		= GetSkillName(58252)
-local SPELL_UNDYING_RESOLVE			= not IsClassic and GetSkillName(51915)
-local SPELL_VAMPIRIC_EMBRACE		= GetSkillName(15286)
-local SPELL_VAMPIRIC_TOUCH			= not IsClassic and GetSkillName(34914)
+local SPELL_UNDYING_RESOLVE			= GetSkillName(51915)
+local SPELL_VAMPIRIC_EMBRACE			= GetSkillName(15286)
+local SPELL_VAMPIRIC_TOUCH			= GetSkillName(34914)
 
 
 
@@ -1221,7 +1221,7 @@ if IsClassic then
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BLOODSURGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
 			},]]
-			--[[MSBT_TRIGGER_BRAIN_FREEZE = {
+			MSBT_TRIGGER_BRAIN_FREEZE = {
 				colorG			= 0.627,
 				colorB			= 0.627,
 				message			= SPELL_BRAIN_FREEZE .. "!",
@@ -1229,7 +1229,7 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "MAGE",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BF_FIREBALL .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			MSBT_TRIGGER_CLEARCASTING = {
 				colorB			= 0,
 				message			= SPELL_CLEARCASTING .. "!",
@@ -1267,7 +1267,7 @@ if IsClassic then
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_EXECUTE,
 				iconSkill		= SPELLID_EXECUTE,
 			},
-			--[[MSBT_TRIGGER_FINGERS_OF_FROST = {
+			MSBT_TRIGGER_FINGERS_OF_FROST = {
 				colorR			= 0.118,
 				colorG			= 0.882,
 				message			= SPELL_FINGERS_OF_FROST .. "!",
@@ -1276,7 +1276,7 @@ if IsClassic then
 				classes			= "MAGE",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_FINGERS_OF_FROST .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 				exceptions		= "recentlyFired;;lt;;2",
-			},]]
+			},
 			MSBT_TRIGGER_HAMMER_OF_WRATH = {
 				colorB			= 0,
 				message			= SPELL_HAMMER_OF_WRATH .. "!",
@@ -1287,7 +1287,7 @@ if IsClassic then
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_HAMMER_OF_WRATH,
 				iconSkill		= SPELLID_HAMMER_OF_WRATH,
 			},
-			--[[MSBT_TRIGGER_KILL_SHOT = {
+			MSBT_TRIGGER_KILL_SHOT = {
 				colorG			= 0.25,
 				colorB			= 0.25,
 				message			= SPELL_KILL_SHOT .. "!",
@@ -1297,8 +1297,8 @@ if IsClassic then
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;target;;threshold;;lt;;20;;unitReaction;;eq;;" .. REACTION_HOSTILE .. "}",
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_KILL_SHOT,
 				iconSkill		= SPELLID_KILL_SHOT,
-			},]]
-			--[[MSBT_TRIGGER_KILLING_MACHINE = {
+			},
+			MSBT_TRIGGER_KILLING_MACHINE = {
 				colorR			= 0.118,
 				colorG			= 0.882,
 				message			= SPELL_KILLING_MACHINE .. "!",
@@ -1306,7 +1306,7 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "DEATHKNIGHT",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_KILLING_MACHINE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			--[[MSBT_TRIGGER_LAVA_SURGE = {
 				colorG			= 0.341,
 				colorB			= 0.129,
@@ -1357,7 +1357,7 @@ if IsClassic then
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;pet;;threshold;;lt;;40}",
 				exceptions		= "recentlyFired;;lt;;5",
 			},
-			--[[MSBT_TRIGGER_MAELSTROM_WEAPON = {
+			MSBT_TRIGGER_MAELSTROM_WEAPON = {
 				colorR			= 0.5,
 				colorB			= 0.5,
 				message			= SPELL_MAELSTROM_WEAPON .. " x5!",
@@ -1365,7 +1365,7 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "SHAMAN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MAELSTROM_WEAPON .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			--[[MSBT_TRIGGER_MANA_TEA = {
 				colorR			= 0,
 				colorG			= 0.5,
@@ -1375,14 +1375,14 @@ if IsClassic then
 				classes			= "MONK",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MANA_TEA .. ";;amount;;eq;;20;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
 			},]]
-			--[[MSBT_TRIGGER_MISSILE_BARRAGE = {
+			MSBT_TRIGGER_MISSILE_BARRAGE = {
 				colorG			= 0.725,
 				message			= SPELL_MISSILE_BARRAGE .. "!",
 				alwaysSticky	= true,
 				fontSize		= 26,
 				classes			= "MAGE",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MISSILE_BARRAGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			--[[MSBT_TRIGGER_MOLTEN_CORE = {
 				colorG			= 0.25,
 				colorB			= 0.25,
@@ -1402,15 +1402,15 @@ if IsClassic then
 				classes			= "WARLOCK",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHADOW_TRANCE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},]]
-			--[[MSBT_TRIGGER_PVP_TRINKET = {
+			MSBT_TRIGGER_PVP_TRINKET = {
 				colorB			= 0,
 				message			= SPELL_PVP_TRINKET .. "! (%r)",
 				alwaysSticky	= true,
 				fontSize		= 26,
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_PVP_TRINKET .. ";;recipientReaction;;eq;;" .. REACTION_HOSTILE .. "}",
 				exceptions		= "zoneType;;ne;;arena",
-			},]]
-			--[[MSBT_TRIGGER_PREDATORS_SWIFTNESS = {
+			},
+			MSBT_TRIGGER_PREDATORS_SWIFTNESS = {
 				colorR			= 0.5,
 				colorB			= 0.5,
 				message			= SPELL_PREDATORS_SWIFTNESS .. "!",
@@ -1418,7 +1418,7 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "DRUID",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_PREDATORS_SWIFTNESS .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			MSBT_TRIGGER_REVENGE = {
 				colorB			= 0,
 				message			= SPELL_REVENGE .. "!",
@@ -1429,7 +1429,7 @@ if IsClassic then
 				exceptions		= "warriorStance;;ne;;2;;unavailableSkill;;eq;;" .. SPELL_REVENGE .. ";;recentlyFired;;lt;;2",
 				iconSkill		= SPELLID_REVENGE,
 			},
-			--[[MSBT_TRIGGER_RIME = {
+			MSBT_TRIGGER_RIME = {
 				colorR			= 0,
 				colorG			= 0.5,
 				message			= SPELL_RIME .. "!",
@@ -1437,7 +1437,7 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "DEATHKNIGHT",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_FREEZING_FOG .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			--[[MSBT_TRIGGER_SHADOW_INFUSION = {
 				colorR			= 0.709,
 				colorG			= 0,
@@ -1456,7 +1456,7 @@ if IsClassic then
 				classes			= "DRUID",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHOOTING_STARS .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},]]
-			--[[MSBT_TRIGGER_SUDDEN_DEATH = {
+			MSBT_TRIGGER_SUDDEN_DEATH = {
 				colorG			= 0,
 				colorB			= 0,
 				message			= SPELL_SUDDEN_DEATH .. "!",
@@ -1464,8 +1464,8 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SUDDEN_DEATH .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_SWORD_AND_BOARD = {
+			},
+			MSBT_TRIGGER_SWORD_AND_BOARD = {
 				colorR			= 0,
 				colorG			= 0.5,
 				message			= SPELL_SWORD_AND_BOARD .. "!",
@@ -1474,8 +1474,8 @@ if IsClassic then
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SWORD_AND_BOARD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_SHIELD_SLAM,
-			},]]
-			--[[MSBT_TRIGGER_TASTE_FOR_BLOOD = {
+			},
+			MSBT_TRIGGER_TASTE_FOR_BLOOD = {
 				colorR			= 0.627,
 				colorG			= 0.5,
 				colorB			= 0,
@@ -1484,8 +1484,8 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TASTE_FOR_BLOOD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_THE_ART_OF_WAR = {
+			},
+			MSBT_TRIGGER_THE_ART_OF_WAR = {
 				colorR			= 0.5,
 				colorB			= 0.5,
 				message			= SPELL_THE_ART_OF_WAR .. "!",
@@ -1493,8 +1493,8 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "PALADIN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_THE_ART_OF_WAR .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_TIDAL_WAVES = {
+			},
+			MSBT_TRIGGER_TIDAL_WAVES = {
 				colorR			= 0,
 				colorG			= 0.5,
 				message			= SPELL_TIDAL_WAVES .. "!",
@@ -1502,7 +1502,7 @@ if IsClassic then
 				fontSize		= 26,
 				classes			= "SHAMAN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TIDAL_WAVES .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			--[[MSBT_TRIGGER_ULTIMATUM = {
 				colorR			= 0,
 				colorG			= 0.5,
@@ -1512,7 +1512,7 @@ if IsClassic then
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ULTIMATUM .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},]]
-			--[[MSBT_TRIGGER_VICTORY_RUSH = {
+			MSBT_TRIGGER_VICTORY_RUSH = {
 				colorG			= 0.25,
 				colorB			= 0.25,
 				message			= SPELL_VICTORY_RUSH .. "!",
@@ -1522,7 +1522,7 @@ if IsClassic then
 				mainEvents		= "PARTY_KILL{sourceAffiliation;;eq;;" .. FLAG_YOU .. "}",
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_VICTORY_RUSH .. ";;trivialTarget;;eq;;true;;recentlyFired;;lt;;2",
 				iconSkill		= SPELLID_VICTORY_RUSH,
-			},--]]
+			},
 			--[[MSBT_TRIGGER_VITAL_MISTS = {
 				colorR			= 0.5,
 				colorB			= 0.5,
@@ -1548,6 +1548,8 @@ if IsClassic then
 
 		-- Animation speed.
 		animationSpeed		= 100,
+
+		lootProcessDelay	= 0.15,
 
 
 		-- Partial effect settings.
@@ -2685,7 +2687,7 @@ else
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BLOODSURGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
 			},]]
-			--[[MSBT_TRIGGER_BRAIN_FREEZE = {
+			MSBT_TRIGGER_BRAIN_FREEZE = {
 				colorG			= 0.627,
 				colorB			= 0.627,
 				message			= SPELL_BRAIN_FREEZE .. "!",
@@ -2693,7 +2695,7 @@ else
 				fontSize		= 26,
 				classes			= "MAGE",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BF_FIREBALL .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			MSBT_TRIGGER_CLEARCASTING = {
 				colorB			= 0,
 				message			= SPELL_CLEARCASTING .. "!",
@@ -2711,7 +2713,7 @@ else
 				classes			= "WARLOCK",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_DECIMATION .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},]]
-			MSBT_TRIGGER_ELUSIVE_BREW = {
+			--[[MSBT_TRIGGER_ELUSIVE_BREW = {
 				colorB			= 0,
 				message			= SPELL_ELUSIVE_BREW .. " x%a!",
 				alwaysSticky	= true,
@@ -2720,7 +2722,7 @@ else
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}&&" ..
 								"SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;10;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}&&" ..
 								"SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;15;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
+			},]]
 			MSBT_TRIGGER_EXECUTE = {
 				colorB			= 0,
 				message			= SPELL_EXECUTE .. "!",
@@ -2751,7 +2753,7 @@ else
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_HAMMER_OF_WRATH,
 				iconSkill		= SPELLID_HAMMER_OF_WRATH,
 			},
-			--[[MSBT_TRIGGER_KILL_SHOT = {
+			MSBT_TRIGGER_KILL_SHOT = {
 				colorG			= 0.25,
 				colorB			= 0.25,
 				message			= SPELL_KILL_SHOT .. "!",
@@ -2761,7 +2763,7 @@ else
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;target;;threshold;;lt;;20;;unitReaction;;eq;;" .. REACTION_HOSTILE .. "}",
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_KILL_SHOT,
 				iconSkill		= SPELLID_KILL_SHOT,
-			},]]
+			},
 			MSBT_TRIGGER_KILLING_MACHINE = {
 				colorR			= 0.118,
 				colorG			= 0.882,
@@ -2771,7 +2773,7 @@ else
 				classes			= "DEATHKNIGHT",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_KILLING_MACHINE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			MSBT_TRIGGER_LAVA_SURGE = {
+			--[[MSBT_TRIGGER_LAVA_SURGE = {
 				colorG			= 0.341,
 				colorB			= 0.129,
 				message			= SPELL_LAVA_SURGE,
@@ -2779,7 +2781,7 @@ else
 				fontSize		= 26,
 				classes			= "SHAMAN",
 				mainEvents		= "SPELL_CAST_SUCCESS{sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillID;;eq;;" .. SPELLID_LAVA_SURGE .. "}",
-			},
+			},]]
 			--[[MSBT_TRIGGER_LOCK_AND_LOAD = {
 				colorR			= 0.627,
 				colorG			= 0.5,
@@ -2821,7 +2823,7 @@ else
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;pet;;threshold;;lt;;40}",
 				exceptions		= "recentlyFired;;lt;;5",
 			},
-			--[[MSBT_TRIGGER_MAELSTROM_WEAPON = {
+			MSBT_TRIGGER_MAELSTROM_WEAPON = {
 				colorR			= 0.5,
 				colorB			= 0.5,
 				message			= SPELL_MAELSTROM_WEAPON .. " x5!",
@@ -2829,7 +2831,7 @@ else
 				fontSize		= 26,
 				classes			= "SHAMAN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MAELSTROM_WEAPON .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			--[[MSBT_TRIGGER_MANA_TEA = {
 				colorR			= 0,
 				colorG			= 0.5,
@@ -2929,7 +2931,7 @@ else
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SUDDEN_DEATH .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_SWORD_AND_BOARD = {
+			MSBT_TRIGGER_SWORD_AND_BOARD = {
 				colorR			= 0,
 				colorG			= 0.5,
 				message			= SPELL_SWORD_AND_BOARD .. "!",
@@ -2938,8 +2940,8 @@ else
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SWORD_AND_BOARD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_SHIELD_SLAM,
-			},]]
-			--[[MSBT_TRIGGER_TASTE_FOR_BLOOD = {
+			},
+			MSBT_TRIGGER_TASTE_FOR_BLOOD = {
 				colorR			= 0.627,
 				colorG			= 0.5,
 				colorB			= 0,
@@ -2948,8 +2950,8 @@ else
 				fontSize		= 26,
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TASTE_FOR_BLOOD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_THE_ART_OF_WAR = {
+			},
+			MSBT_TRIGGER_THE_ART_OF_WAR = {
 				colorR			= 0.5,
 				colorB			= 0.5,
 				message			= SPELL_THE_ART_OF_WAR .. "!",
@@ -2957,7 +2959,7 @@ else
 				fontSize		= 26,
 				classes			= "PALADIN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_THE_ART_OF_WAR .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			MSBT_TRIGGER_TIDAL_WAVES = {
 				colorR			= 0,
 				colorG			= 0.5,
@@ -3013,6 +3015,7 @@ else
 		-- Animation speed.
 		animationSpeed		= 100,
 
+		lootProcessDelay	= 0.15,
 
 		-- Partial effect settings.
 		crushing		= { colorR = 0.5, colorG = 0, colorB = 0, trailer = string_gsub(CRUSHING_TRAILER, "%((.+)%)", "<%1>") },
