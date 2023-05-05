@@ -8,6 +8,12 @@ local mod = {}
 local modName = "MikSBT"
 _G[modName] = mod
 
+local GetAddOnMetadata_Orig = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+
+local function GetAddOnMetadata(name, tag)
+    local retOK, ret1 = pcall(GetAddOnMetadata_Orig, name, tag)
+    if (retOK) then return ret1 end
+end
 
 -------------------------------------------------------------------------------
 -- Imports.

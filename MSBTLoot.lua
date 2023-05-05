@@ -25,8 +25,6 @@ local GetItemInfo = GetItemInfo
 local GetItemCount = GetItemCount
 local DisplayEvent = MikSBT.Animations.DisplayEvent
 
-local IsClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-
 -------------------------------------------------------------------------------
 -- Constants.
 -------------------------------------------------------------------------------
@@ -83,22 +81,17 @@ local function HandleCurrency(parserEvent)
 	local itemLink = parserEvent.itemLink
 	local itemName, numAmount, itemTexture, totalMax, itemQuality, numLootedFromMessage
 
-	if IsClassic then
-		local _
-		itemName, numAmount, itemTexture, _, _, totalMax, _, itemQuality = GetCurrencyInfo(itemLink)
+	local currency = C_CurrencyInfo.GetCurrencyInfoFromLink(itemLink)
+	if currency then
+		itemName, numAmount, itemTexture, totalMax, itemQuality = currency.name, currency.quantity, currency.iconFileID, currency.maxQuantity, currency.quality
 	else
-		local currency = C_CurrencyInfo.GetCurrencyInfoFromLink(itemLink)
-                if currency then
-		    itemName, numAmount, itemTexture, totalMax, itemQuality = currency.name, currency.quantity, currency.iconFileID, currency.maxQuantity, currency.quality
-                else
-                    if string.match(itemLink,"^, %d+") then
+		if string.match(itemLink,"^, %d+") then
 			numLootedFromMessage = string.match(itemLink, "%d+")
-                        currency = C_CurrencyInfo.GetCurrencyInfo(1901)
-                        itemName, numAmount, itemTexture, totalMax, itemQuality = currency.name, currency.quantity, currency.iconFileID, currency.maxQuantity, currency.quality
-                    else
+			currency = C_CurrencyInfo.GetCurrencyInfo(1901)
+			itemName, numAmount, itemTexture, totalMax, itemQuality = currency.name, currency.quantity, currency.iconFileID, currency.maxQuantity, currency.quality
+		else
 			return
-                    end
-                end
+		end
 	end
 
 	-- Determine whether to show the event and ignore it if necessary.
@@ -127,20 +120,6 @@ end
 
 
 local function loot_wait(itemLink, itemName, itemTexture, numLooted)
---[[	local numItems = 0
-	for bag = 0, NUM_BAG_SLOTS do
-		for slot = 1, GetContainerNumSlots(bag) do
-			local bagItem = GetContainerItemLink(bag, slot)
-			if bagItem then
-				local bagItemLink = select(2, GetItemInfo(bagItem))
-				if bagItemLink == itemLink then
-					local bagItemCount = select(2, GetContainerItemInfo(bag, slot))
-					numItems = numItems + bagItemCount
-				end
-			end
-		end
-	end
-]]--
 	local numItems = GetItemCount(itemLink)
 	
 	if (numItems == 0) then
