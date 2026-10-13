@@ -7,12 +7,18 @@ function DisplayService:Configure(config)
 end
 
 function DisplayService:DisplayEvent(eventSettings, message, texturePath, muteSound)
-	if eventSettings.disabled or self.config.isModDisabled() then return end
+	local trace = MikSBT.Trace
+	trace:Inc("ds:call")
+	if eventSettings.disabled or self.config.isModDisabled() then
+		trace:Inc("ds:disabled")
+		return
+	end
 	local profile = self.config.getProfile()
 	local scrollAreas = self.config.scrollAreas
 	local areaKey = eventSettings.scrollArea or self.config.defaultArea
 	local area = scrollAreas:Resolve(areaKey)
 	if not area or area.disabled or scrollAreas:IsSuppressedInGroup(areaKey) then
+		trace:Inc("ds:area " .. tostring(areaKey))
 		return
 	end
 

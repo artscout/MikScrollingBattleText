@@ -119,6 +119,19 @@ local function LoadFont(fontName)
 	fontLoaderFrame:Hide()
 end
 
+local function ReleaseDisplayEvent(displayEvent)
+	displayEvent.fontString:SetAlpha(0)
+	local texture = displayEvent.texture
+	if texture then
+		texture:SetAlpha(0)
+		texture:SetTexture(nil)
+		textureCache[#textureCache + 1] = texture
+		displayEvent.texture = nil
+	end
+	displayEvent.animationComplete = false
+	displayEventCache[#displayEventCache + 1] = displayEvent
+end
+
 local function Display(message, saSettings, isSticky, colorR, colorG, colorB, fontSize, fontPath, outlineIndex, fontAlpha, texturePath)
 
 	local animStyleSettings, direction, behavior, textAlignIndex
@@ -134,7 +147,9 @@ local function Display(message, saSettings, isSticky, colorR, colorG, colorB, fo
 		textAlignIndex = saSettings.textAlignIndex
 	end
 
+	MikSBT.Trace:Inc("anim:display")
 	if not animStyleSettings then
+		MikSBT.Trace:Inc("anim:nostyle")
 		return
 	end
 
@@ -218,7 +233,13 @@ local function Display(message, saSettings, isSticky, colorR, colorG, colorB, fo
 	displayEvent.scrollTime = DEFAULT_SCROLL_TIME
 	displayEvent.fadePercent = DEFAULT_FADE_PERCENT
 
-	animStyleSettings.initHandler(displayEvent, animationArray, direction, behavior)
+	local initOK, initError = pcall(animStyleSettings.initHandler, displayEvent, animationArray, direction, behavior)
+	if not initOK then
+		MikSBT.Trace:Error("anim:init", initError)
+		ReleaseDisplayEvent(displayEvent)
+		return
+	end
+	MikSBT.Trace:Inc("anim:shown")
 	fontString:SetPoint(displayEvent.anchorPoint, displayEvent.offsetX + displayEvent.positionX, displayEvent.offsetY + displayEvent.positionY)
 	displayEvent.scrollTime = displayEvent.scrollTime / displayEvent.animationSpeed
 
@@ -274,7 +295,7 @@ local function OnUpdateAnimationFrame(this, elapsed)
 
 	local allInactive = true
 
-	local numEvents, displayEvent, texture
+	local numEvents, displayEvent
 
 	for _, animationArray in pairs(animationData) do
 
@@ -287,7 +308,15 @@ local function OnUpdateAnimationFrame(this, elapsed)
 
 				if displayEvent.timeSinceLastUpdate >= ANIMATION_DELAY then
 					displayEvent.elapsedTime = displayEvent.elapsedTime + displayEvent.timeSinceLastUpdate
-					AnimateEvent(displayEvent)
+					local animOK, animError = pcall(AnimateEvent, displayEvent)
+					if not animOK then
+						MikSBT.Trace:Error("anim:update", animError)
+						displayEvent.fontString:SetAlpha(0)
+						if displayEvent.texture then
+							displayEvent.texture:SetAlpha(0)
+						end
+						displayEvent.animationComplete = true
+					end
 					displayEvent.timeSinceLastUpdate = 0
 				end
 
@@ -298,16 +327,7 @@ local function OnUpdateAnimationFrame(this, elapsed)
 				displayEvent = displayEvents[i]
 				if displayEvent.animationComplete then
 					table_remove(displayEvents, i)
-
-					texture = displayEvent.texture
-					if texture then
-						textureCache[#textureCache + 1] = texture
-						texture:SetTexture(nil)
-						displayEvent.texture = nil
-					end
-
-					displayEventCache[#displayEventCache + 1] = displayEvent
-					displayEvent.animationComplete = false
+					ReleaseDisplayEvent(displayEvent)
 				end
 			end
 			if #displayEvents == 0 then
@@ -354,6 +374,20 @@ module.IterateScrollAreas			= function()
 	return ScrollAreas:Iterate()
 end
 module.LoadFont						= LoadFont
+module.GetTraceState				= function()
+	local active = 0
+	for _, areas in pairs(animationData) do
+		for _, events in pairs(areas) do
+			active = active + #events
+		end
+	end
+	return {
+		frameShown = animationFrame:IsShown(),
+		frameVisible = animationFrame:IsVisible(),
+		active = active,
+		cached = #displayEventCache,
+	}
+end
 module.DisplayMessage				= function(...)
 	return DisplayService:DisplayMessage(...)
 end

@@ -9,6 +9,7 @@ local MSBTOptMain = MSBTOptions.Main
 local MSBTControls = MSBTOptions.Controls
 local MSBTPopups = MSBTOptions.Popups
 local MSBTProfiles = MikSBT.Profiles
+local MSBTTriggers = MikSBT.Triggers
 local MSBTAnimations = MikSBT.Animations
 local MSBTMedia = MikSBT.Media
 local L = MikSBT.translations
@@ -134,6 +135,9 @@ GeneralTab_Populate = function()
 	controls.disableIncomingInGroupCheckbox:SetChecked(not not currentProfile.disableIncomingInGroup)
 	controls.disableNotificationInGroupCheckbox:SetChecked(not not currentProfile.disableNotificationInGroup)
 	controls.disableStaticInGroupCheckbox:SetChecked(not not currentProfile.disableStaticInGroup)
+	if controls.showGuessedOutgoingInGroupCheckbox then
+		controls.showGuessedOutgoingInGroupCheckbox:SetChecked(not not currentProfile.showGuessedOutgoingInGroup)
+	end
 	controls.stickyCritsCheckbox:SetChecked(not currentProfile.stickyCritsDisabled)
 	controls.shortenNumbersCheckbox:SetChecked(currentProfile.shortenNumbers)
 	controls.stackSimilarHitsCheckbox:SetChecked(currentProfile.stackSimilarHits)
@@ -272,6 +276,19 @@ local function GeneralTab_Create()
 	)
 	controls.disableStaticInGroupCheckbox = checkbox
 
+	-- Guessed outgoing damage in group checkbox.
+	checkbox = MSBTControls.CreateCheckbox(tabFrame)
+	objLocale = L.CHECKBOXES["showGuessedOutgoingInGroup"] or { label = "Outgoing Damage In Group", tooltip = "Without the combat log outgoing damage is attributed from UNIT_COMBAT, which also reports hits dealt by other players. In a party or raid only hits that match your own casts, damage-over-time ticks and auto attack swings are counted. Uncheck to hide outgoing damage while in a group." }
+	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
+	checkbox:SetPoint("TOPLEFT", controls.disableStaticInGroupCheckbox, "BOTTOMLEFT", 0, -5)
+	checkbox:SetClickHandler(
+		function (this, isChecked)
+			MSBTProfiles.SetOption(nil, "showGuessedOutgoingInGroup", isChecked)
+		end
+	)
+	controls.showGuessedOutgoingInGroupCheckbox = checkbox
+
+	-- Blizzard floating combat text (v2) checkbox.
 	checkbox = MSBTControls.CreateCheckbox(tabFrame)
 	objLocale = L.CHECKBOXES["enableBlizzardV2CombatText"] or { label = "Disable Blizzard CT While Solo", tooltip = "When checked, disables Blizzard floating combat text damage/healing while solo." }
 	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
@@ -368,7 +385,7 @@ local function GeneralTab_Create()
 
 
 
-	button = MSBTControls.CreateOptionButton(tabFrame)
+	local button = MSBTControls.CreateOptionButton(tabFrame)
 	objLocale = L.BUTTONS["classColors"]
 	button:Configure(20, objLocale.label, objLocale.tooltip)
 	button:SetPoint("BOTTOMLEFT", tabFrame, "BOTTOMLEFT", 5, 15)
@@ -1982,6 +1999,568 @@ local function ResetBlizzardSCTTab_OnShow()
 end
 
 
+-- ****************************************************************************
+-- Enables the controls on the triggers tab.
+-- ****************************************************************************
+local function TriggersTab_EnableControls()
+	for name, frame in pairs(tabFrames.triggers.controls) do
+		if (frame.Enable) then frame:Enable() end
+	end
+end
+
+
+-- ****************************************************************************
+-- Saves the trigger settings selected by the user.
+-- ****************************************************************************
+local function TriggersTab_SaveTriggerSettings(settings, triggerKey)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "classes", settings.classes)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "mainEvents", settings.mainEvents)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "exceptions", settings.exceptions)
+	MSBTTriggers.UpdateTriggers()
+end
+
+
+-- ****************************************************************************
+-- Adds a new trigger with the passed output message.
+-- ****************************************************************************
+local function TriggersTab_AddTrigger(settings)
+	local nextAvailable = 1
+	while (MSBTProfiles.currentProfile.triggers["Custom" .. nextAvailable]) do
+		nextAvailable = nextAvailable + 1
+	end
+
+	local newKey = "Custom" .. nextAvailable
+	local triggerSettings = {}
+	triggerSettings.message = settings.inputText
+	triggerSettings.alwaysSticky = true
+	triggerSettings.fontSize = 26
+	MSBTProfiles.SetOption("triggers", newKey, triggerSettings)
+	MSBTTriggers.UpdateTriggers()
+	tabFrames.triggers.controls.triggersListbox:AddItem(newKey, true)
+
+	-- Launch the trigger settings dialog for the new trigger.
+	EraseTable(configTable)
+	configTable.title = settings.inputText
+	configTable.triggerKey = newKey
+	configTable.parentFrame = tabFrames.triggers
+	configTable.anchorFrame = tabFrames.triggers
+	configTable.anchorPoint = "RIGHT"
+	configTable.relativePoint = "RIGHT"
+	configTable.saveHandler = TriggersTab_SaveTriggerSettings
+	configTable.saveArg1 = newKey
+	configTable.hideHandler = TriggersTab_EnableControls
+	DisableControls(tabFrames.triggers.controls)
+	MSBTPopups.ShowTrigger(configTable)
+end
+
+
+-- ****************************************************************************
+-- Called when one of the trigger color swatches is changed.
+-- ****************************************************************************
+local function TriggersTab_ColorswatchOnChanged(this)
+	local triggerKey = this:GetParent().triggerKey
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "colorR", this.r, 1)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "colorG", this.g, 1)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "colorB", this.b, 1)
+	MSBTTriggers.UpdateTriggers()
+end
+
+
+-- ****************************************************************************
+-- Called when one of the trigger enable checkboxes is clicked.
+-- ****************************************************************************
+local function TriggersTab_EnableOnClick(this, isChecked)
+	local triggerKey = this:GetParent().triggerKey
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "disabled", not isChecked)
+	MSBTTriggers.UpdateTriggers()
+end
+
+
+-- ****************************************************************************
+-- Called when one of the trigger settings buttons is clicked.
+-- ****************************************************************************
+local function TriggersTab_TriggerSettingsButtonOnClick(this)
+	local triggerKey = this:GetParent().triggerKey
+	local triggerSettings = MSBTProfiles.currentProfile.triggers[triggerKey]
+
+	EraseTable(configTable)
+	configTable.title = this:GetParent().enableCheckbox.fontString:GetText()
+	configTable.triggerKey = triggerKey
+	configTable.parentFrame = tabFrames.triggers
+	configTable.anchorFrame = tabFrames.triggers
+	configTable.anchorPoint = "RIGHT"
+	configTable.relativePoint = "RIGHT"
+	configTable.saveHandler = TriggersTab_SaveTriggerSettings
+	configTable.saveArg1 = triggerKey
+	configTable.hideHandler = TriggersTab_EnableControls
+	DisableControls(tabFrames.triggers.controls)
+	MSBTPopups.ShowTrigger(configTable)
+end
+
+
+-- ****************************************************************************
+-- Saves the font settings selected by the user.
+-- ****************************************************************************
+local function TriggersTab_SaveFontSettings(settings, triggerKey)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "fontName", settings.normalFontName)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "outlineIndex", settings.normalOutlineIndex)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "fontSize", settings.normalFontSize)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "fontAlpha", settings.normalFontAlpha)
+	MSBTTriggers.UpdateTriggers()
+end
+
+
+-- ****************************************************************************
+-- Called when one of the font settings buttons is clicked.
+-- ****************************************************************************
+local function TriggersTab_FontButtonOnClick(this)
+	local triggerKey = this:GetParent().triggerKey
+	local triggerSettings = MSBTProfiles.currentProfile.triggers[triggerKey]
+
+	local saKey = triggerSettings.scrollArea
+	local saSettings = MSBTProfiles.currentProfile.scrollAreas[saKey]
+	if (not saSettings) then saSettings = MSBTProfiles.currentProfile.scrollAreas[DEFAULT_SCROLL_AREA] end
+
+	EraseTable(configTable)
+	configTable.title = this:GetParent().enableCheckbox.fontString:GetText()
+
+	local fontName
+	fontName = saSettings.normalFontName
+	if (not fonts[fontName]) then fontName = MSBTProfiles.currentProfile.normalFontName end
+	if (not fonts[fontName]) then fontName = DEFAULT_FONT_NAME end
+	configTable.inheritedNormalFontName = fontName
+	configTable.inheritedNormalOutlineIndex = saSettings.normalOutlineIndex or MSBTProfiles.currentProfile.normalOutlineIndex
+	configTable.inheritedNormalFontSize = saSettings.normalFontSize or MSBTProfiles.currentProfile.normalFontSize
+	configTable.inheritedNormalFontAlpha = saSettings.normalFontAlpha or MSBTProfiles.currentProfile.normalFontAlpha
+
+	fontName = triggerSettings.fontName
+	if (not fonts[fontName]) then fontName = nil end
+	configTable.normalFontName = fontName
+	configTable.normalOutlineIndex = triggerSettings.outlineIndex
+	configTable.normalFontSize = triggerSettings.fontSize
+	configTable.normalFontAlpha = triggerSettings.fontAlpha
+
+	configTable.hideCrit = true
+
+
+	configTable.parentFrame = tabFrames.triggers
+	configTable.anchorFrame = tabFrames.triggers
+	configTable.anchorPoint = "BOTTOM"
+	configTable.relativePoint = "BOTTOM"
+	configTable.saveHandler = TriggersTab_SaveFontSettings
+	configTable.saveArg1 = triggerKey
+	configTable.hideHandler = TriggersTab_EnableControls
+	DisableControls(tabFrames.triggers.controls)
+	MSBTPopups.ShowFont(configTable)
+end
+
+
+-- ****************************************************************************
+-- Saves the additional event settings selected by the user.
+-- ****************************************************************************
+local function TriggersTab_SaveEventSettings(settings, triggerKey)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "scrollArea", settings.scrollArea, DEFAULT_SCROLL_AREA)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "message", settings.message)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "alwaysSticky", settings.alwaysSticky)
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "soundFile", settings.soundFile, "")
+	MSBTProfiles.SetOption("triggers." .. triggerKey, "iconSkill", settings.iconSkill, "")
+	MSBTTriggers.UpdateTriggers()
+
+	tabFrames.triggers.controls.triggersListbox:Refresh()
+end
+
+
+-- ****************************************************************************
+-- Called when one of the event settings buttons is clicked.
+-- ****************************************************************************
+local function TriggersTab_EventSettingsButtonOnClick(this)
+	local triggerKey = this:GetParent().triggerKey
+	local triggerSettings = MSBTProfiles.currentProfile.triggers[triggerKey]
+
+	EraseTable(configTable)
+	configTable.title = this:GetParent().enableCheckbox.fontString:GetText()
+	configTable.message = triggerSettings.message
+	configTable.scrollArea = triggerSettings.scrollArea or DEFAULT_SCROLL_AREA
+	configTable.alwaysSticky = triggerSettings.alwaysSticky
+	configTable.soundFile = triggerSettings.soundFile
+	configTable.showIconSkillEditbox = true
+	configTable.iconSkill = triggerSettings.iconSkill
+	configTable.parentFrame = tabFrames.triggers
+	configTable.anchorFrame = tabFrames.triggers
+	configTable.anchorPoint = "TOPRIGHT"
+	configTable.relativePoint = "TOPRIGHT"
+	configTable.saveHandler = TriggersTab_SaveEventSettings
+	configTable.saveArg1 = triggerKey
+	configTable.hideHandler = TriggersTab_EnableControls
+	DisableControls(tabFrames.triggers.controls)
+	MSBTPopups.ShowEvent(configTable)
+end
+
+
+-- ****************************************************************************
+-- Deletes the trigger for the passed line and removes the line.
+-- ****************************************************************************
+local function TriggersTab_DeleteTrigger(line)
+	MSBTProfiles.SetOption("triggers", line.triggerKey, false)
+	tabFrames.triggers.controls.triggersListbox:RemoveItem(line.itemNumber)
+	MSBTTriggers.UpdateTriggers()
+end
+
+
+-- ****************************************************************************
+-- Called when one of the delete buttons is clicked.
+-- ****************************************************************************
+local function TriggersTab_DeleteButtonOnClick(this)
+	EraseTable(configTable)
+	configTable.parentFrame = tabFrames.triggers
+	configTable.anchorFrame = this
+	configTable.anchorPoint = this:GetParent().lineNumber > 5 and "BOTTOMRIGHT" or "TOPRIGHT"
+	configTable.relativePoint = this:GetParent().lineNumber > 5 and "TOPRIGHT" or "BOTTOMRIGHT"
+	configTable.acknowledgeHandler = TriggersTab_DeleteTrigger
+	configTable.saveArg1 = this:GetParent()
+	configTable.hideHandler = TriggersTab_EnableControls
+	DisableControls(tabFrames.triggers.controls)
+	MSBTPopups.ShowAcknowledge(configTable)
+end
+
+
+-- ****************************************************************************
+-- Called by listbox to create a line for triggers.
+-- ****************************************************************************
+local function TriggersTab_CreateLine(this)
+	local controls = tabFrames.triggers.controls
+
+	local frame = CreateFrame("Button", nil, this)
+	frame:EnableMouse(false)
+
+	-- Event colorswatch.
+	local colorswatch = MSBTControls.CreateColorswatch(frame)
+	colorswatch:SetPoint("LEFT", frame, "LEFT", 5, 0)
+	colorswatch:SetColorChangedHandler(TriggersTab_ColorswatchOnChanged)
+	frame.colorSwatch = colorswatch
+	controls[#controls+1] = colorswatch
+
+	-- Enable checkbox.
+	local checkbox = MSBTControls.CreateCheckbox(frame)
+	local objLocale = L.CHECKBOXES["enableTrigger"]
+	checkbox:Configure(24, nil, objLocale.tooltip)
+	checkbox:SetPoint("LEFT", colorswatch, "RIGHT", 5, 0)
+	checkbox:SetPoint("RIGHT", frame, "LEFT", 190, 0)
+	checkbox:SetClickHandler(TriggersTab_EnableOnClick)
+	frame.enableCheckbox = checkbox
+	controls[#controls+1] = checkbox
+
+	-- Delete trigger button.
+	local button = MSBTControls.CreateIconButton(frame, "Delete")
+	objLocale = L.BUTTONS["deleteTrigger"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+	button:SetClickHandler(TriggersTab_DeleteButtonOnClick)
+	controls[#controls+1] = button
+
+	-- Event settings button.
+	button = MSBTControls.CreateIconButton(frame, "Configure")
+	objLocale = L.BUTTONS["eventSettings"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", controls[#controls], "LEFT", 0, 0)
+	button:SetClickHandler(TriggersTab_EventSettingsButtonOnClick)
+	controls[#controls+1] = button
+
+	-- Event font settings button.
+	button = MSBTControls.CreateIconButton(frame, "FontSettings")
+	objLocale = L.BUTTONS["eventFontSettings"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", controls[#controls], "LEFT", 0, 0)
+	button:SetClickHandler(TriggersTab_FontButtonOnClick)
+	controls[#controls+1] = button
+
+	-- Trigger settings button.
+	button = MSBTControls.CreateIconButton(frame, "TriggerSettings")
+	objLocale = L.BUTTONS["triggerSettings"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", controls[#controls], "LEFT", 0, 0)
+	button:SetClickHandler(TriggersTab_TriggerSettingsButtonOnClick)
+	controls[#controls+1] = button
+
+	return frame
+end
+
+
+-- ****************************************************************************
+-- Called by listbox to display a line.
+-- ****************************************************************************
+local function TriggersTab_DisplayLine(this, line, key, isSelected)
+	local triggerSettings = MSBTProfiles.currentProfile.triggers[key]
+	line.triggerKey = key
+
+	line.colorSwatch:SetColor(triggerSettings.colorR or 1, triggerSettings.colorG or 1, triggerSettings.colorB or 1)
+	line.enableCheckbox:SetLabel(triggerSettings.message)
+	line.enableCheckbox:SetChecked(not triggerSettings.disabled)
+end
+
+
+-- ****************************************************************************
+-- Creates the triggers tab frame contents.
+-- ****************************************************************************
+local function TriggersTab_Create()
+	local tabFrame = tabFrames.triggers
+	tabFrame.controls = {}
+	local controls = tabFrame.controls
+
+	-- Horizontal bar.
+	local texture = tabFrame:CreateTexture(nil, "ARTWORK")
+	texture:SetTexture("Interface\\PaperDollInfoFrame\\SkillFrame-BotLeft")
+	texture:SetHeight(4)
+	texture:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 0, -45)
+	texture:SetPoint("TOPRIGHT", tabFrame, "TOPRIGHT", 0, -45)
+	texture:SetTexCoord(0.078125, 1, 0.59765625, 0.61328125)
+
+	-- Add trigger button.
+	local button = MSBTControls.CreateOptionButton(tabFrame)
+	local objLocale = L.BUTTONS["addTrigger"]
+	button:Configure(20, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMLEFT", texture, "TOPLEFT", 5, 15)
+	button:SetClickHandler(
+		function (this)
+			objLocale = L.EDITBOXES["eventMessage"]
+			EraseTable(configTable)
+			configTable.defaultText = L.MSG_NEW_TRIGGER
+			configTable.editboxLabel = objLocale.label
+			configTable.editboxTooltip = objLocale.tooltip
+			configTable.parentFrame = tabFrames.triggers
+			configTable.anchorFrame = this
+			configTable.saveHandler = TriggersTab_AddTrigger
+			configTable.hideHandler = TriggersTab_EnableControls
+			DisableControls(controls)
+			MSBTPopups.ShowInput(configTable)
+		end
+	)
+	controls.addTriggerButton = button
+
+
+	-- Triggers listbox.
+	local listbox = MSBTControls.CreateListbox(tabFrame)
+	listbox:Configure(400, 300, 25)
+	listbox:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 0, -50)
+	listbox:SetCreateLineHandler(TriggersTab_CreateLine)
+	listbox:SetDisplayHandler(TriggersTab_DisplayLine)
+	controls.triggersListbox = listbox
+
+	-- Reusable table for triggers.
+	tabFrame.triggerTable = {}
+
+	tabFrame.created = true
+end
+
+
+-- ****************************************************************************
+-- Called when the tab frame is shown.
+-- ****************************************************************************
+local function TriggersTab_OnShow()
+	if (not tabFrames.triggers.created) then TriggersTab_Create() end
+
+	-- Set the frame up to populate the profile options when it is shown.
+	local triggersListbox = tabFrames.triggers.controls.triggersListbox
+
+	-- Get triggers from the current profile.
+	local triggerTable = tabFrames.triggers.triggerTable
+	EraseTable(triggerTable)
+	local currentProfileTriggers = rawget(MSBTProfiles.currentProfile, "triggers")
+	if (currentProfileTriggers) then
+		for triggerKey, triggerSettings in pairs(currentProfileTriggers) do
+			if (triggerSettings) then triggerTable[triggerKey] = triggerSettings.message end
+		end
+	end
+
+	-- Get triggers available in the master profile that aren't in the current profile.
+	for triggerKey, triggerSettings in pairs(MSBTProfiles.masterProfile.triggers) do
+		if (not currentProfileTriggers or rawget(currentProfileTriggers, triggerKey) == nil) then
+			triggerTable[triggerKey] = triggerSettings.message
+		end
+	end
+
+	-- Set the frame up to populate the profile options when it is shown.
+	local listbox = tabFrames.triggers.controls.triggersListbox
+	local sortedKeys = SortKeysByValue(triggerTable)
+
+	local previousOffset = listbox:GetOffset()
+	listbox:Clear()
+	for _, key in ipairs(sortedKeys) do
+		listbox:AddItem(key)
+	end
+	listbox:SetOffset(previousOffset)
+end
+
+
+local function SpamTab_EnableControls()
+	local controls = tabFrames.spam.controls
+	for name, frame in pairs(controls) do
+		if (frame.Enable) then frame:Enable() end
+	end
+end
+
+
+local function SpamTab_Create()
+	local tabFrame = tabFrames.spam
+	tabFrame.controls = {}
+	local controls = tabFrame.controls
+
+	local checkbox, objLocale
+	local previous
+	checkbox = MSBTControls.CreateCheckbox(tabFrame)
+	objLocale = L.CHECKBOXES["hideSkills"]
+	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
+	if previous then
+		checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
+	else
+		checkbox:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 5, -10)
+	end
+	checkbox:SetClickHandler(
+		function (this, isChecked)
+			MSBTProfiles.SetOption(nil, "hideSkills", isChecked)
+		end
+	)
+	controls.hideSkillsCheckbox = checkbox
+	previous = checkbox
+
+	checkbox = MSBTControls.CreateCheckbox(tabFrame)
+	objLocale = L.CHECKBOXES["hideNames"]
+	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
+	if previous then
+		checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
+	else
+		checkbox:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 5, -10)
+	end
+	checkbox:SetClickHandler(
+		function (this, isChecked)
+			MSBTProfiles.SetOption(nil, "hideNames", isChecked)
+		end
+	)
+	controls.hideNamesCheckbox = checkbox
+	previous = checkbox
+
+	checkbox = MSBTControls.CreateCheckbox(tabFrame)
+	objLocale = L.CHECKBOXES["abbreviateSkills"]
+	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
+	if previous then
+		checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
+	else
+		checkbox:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 5, -10)
+	end
+	checkbox:SetClickHandler(
+		function (this, isChecked)
+			MSBTProfiles.SetOption(nil, "abbreviateAbilities", isChecked)
+		end
+	)
+	controls.abbreviateCheckbox = checkbox
+	previous = checkbox
+
+	checkbox = MSBTControls.CreateCheckbox(tabFrame)
+	objLocale = L.CHECKBOXES["groupNumbers"]
+	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
+	if previous then
+		checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
+	else
+		checkbox:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 5, -10)
+	end
+	checkbox:SetClickHandler(
+		function (this, isChecked)
+			MSBTProfiles.SetOption(nil, "groupNumbers", isChecked)
+		end
+	)
+	controls.groupNumbersCheckbox = checkbox
+	previous = checkbox
+
+	checkbox = MSBTControls.CreateCheckbox(tabFrame)
+	objLocale = L.CHECKBOXES["allPowerGains"]
+	checkbox:Configure(28, objLocale.label, objLocale.tooltip)
+	if previous then
+		checkbox:SetPoint("TOPLEFT", previous, "BOTTOMLEFT", 0, 0)
+	else
+		checkbox:SetPoint("TOPLEFT", tabFrame, "TOPLEFT", 5, -10)
+	end
+	checkbox:SetClickHandler(
+		function (this, isChecked)
+			MSBTProfiles.SetOption(nil, "showAllPowerGains", isChecked)
+		end
+	)
+	controls.allPowerCheckbox = checkbox
+	previous = checkbox
+
+	local button = MSBTControls.CreateOptionButton(tabFrame)
+	objLocale = L.BUTTONS["skillSubstitutions"]
+	button:Configure(20, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMRIGHT", tabFrame, "BOTTOMRIGHT", -10, 15)
+	button:SetClickHandler(
+		function (this)
+			local listName = "abilitySubstitutions"
+			PopulateList(listName)
+			EraseTable(configTable)
+			configTable.title = this:GetText()
+			configTable.skills = listTable
+			configTable.listType = "substitution"
+			configTable.parentFrame = tabFrame
+			configTable.anchorFrame = this
+			configTable.anchorPoint = "BOTTOMRIGHT"
+			configTable.relativePoint = "TOPRIGHT"
+			configTable.saveHandler = SaveList
+			configTable.saveArg1 = listName
+			configTable.hideHandler = SpamTab_EnableControls
+			DisableControls(controls)
+			MSBTPopups.ShowSkillList(configTable)
+		end
+	)
+	controls.skillSubstitutionsButton = button
+
+	button = MSBTControls.CreateOptionButton(tabFrame)
+	objLocale = L.BUTTONS["skillSuppressions"]
+	button:Configure(20, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMLEFT", controls.skillSubstitutionsButton, "TOPLEFT", 0, 10)
+	button:SetClickHandler(
+		function (this)
+			local listName = "abilitySuppressions"
+			PopulateList(listName)
+			EraseTable(configTable)
+			configTable.title = this:GetText()
+			configTable.skills = listTable
+			configTable.parentFrame = tabFrame
+			configTable.anchorFrame = this
+			configTable.anchorPoint = "BOTTOMRIGHT"
+			configTable.relativePoint = "TOPRIGHT"
+			configTable.saveHandler = SaveList
+			configTable.saveArg1 = listName
+			configTable.hideHandler = SpamTab_EnableControls
+			DisableControls(controls)
+			MSBTPopups.ShowSkillList(configTable)
+		end
+	)
+	controls.skillSuppressionsButton = button
+
+	tabFrame.created = true
+end
+
+
+local function SpamTab_OnShow()
+	if (not tabFrames.spam.created) then SpamTab_Create() end
+
+	local currentProfile = MSBTProfiles.currentProfile
+	local controls = tabFrames.spam.controls
+
+	controls.hideSkillsCheckbox:SetChecked(currentProfile.hideSkills)
+	controls.hideNamesCheckbox:SetChecked(currentProfile.hideNames)
+	controls.abbreviateCheckbox:SetChecked(currentProfile.abbreviateAbilities)
+	controls.groupNumbersCheckbox:SetChecked(currentProfile.groupNumbers)
+	controls.allPowerCheckbox:SetChecked(currentProfile.showAllPowerGains)
+end
+
+
+
+
+
+
+-------------------------------------------------------------------------------
+-- Initialization.
+-------------------------------------------------------------------------------
 
 local objLocale = L.TABS.general
 local tabFrame = CreateFrame("Frame")
@@ -2011,6 +2590,23 @@ tabFrame:SetScript("OnShow", EventsTab_OnShow)
 tabFrames.events = tabFrame
 MSBTOptMain.AddTab(tabFrame, objLocale.label, objLocale.tooltip)
 
+-- Create an empty frame for the triggers tab that will be dynamically created when shown.
+objLocale = L.TABS.triggers or { label = "Triggers", tooltip = "Display options for the trigger system.\n\nMouse over the icon buttons for more information." }
+tabFrame = CreateFrame("Frame")
+tabFrame:Hide()
+tabFrame:SetScript("OnShow", TriggersTab_OnShow)
+tabFrames.triggers = tabFrame
+MSBTOptMain.AddTab(tabFrame, objLocale.label, objLocale.tooltip)
+
+-- Create an empty frame for the spam tab that will be dynamically created when shown.
+objLocale = L.TABS.spamControl or { label = "Spam Control", tooltip = "Display options for controlling spam." }
+tabFrame = CreateFrame("Frame")
+tabFrame:Hide()
+tabFrame:SetScript("OnShow", SpamTab_OnShow)
+tabFrames.spam = tabFrame
+MSBTOptMain.AddTab(tabFrame, objLocale.label, objLocale.tooltip)
+
+-- Create an empty frame for the loot alerts tab that will be dynamically created when shown.
 objLocale = L.TABS.lootAlerts
 tabFrame = CreateFrame("Frame")
 tabFrame:Hide()
@@ -2018,6 +2614,7 @@ tabFrame:SetScript("OnShow", LootAlertsTab_OnShow)
 tabFrames.lootAlerts = tabFrame
 MSBTOptMain.AddTab(tabFrame, objLocale.label, objLocale.tooltip)
 
+-- Create an empty frame for the language tab that will be dynamically created when shown.
 objLocale = L.TABS.language or { label = "Language", tooltip = "Shows the current locale and language behavior." }
 tabFrame = CreateFrame("Frame")
 tabFrame:Hide()

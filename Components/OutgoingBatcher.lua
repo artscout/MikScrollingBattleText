@@ -24,20 +24,9 @@ function OutgoingBatcher:BuildMessage(amount, hitCount, critCount)
 		return formattedAmount
 	end
 
-	local hitsWord = hitCount == 1 and "hit" or "hits"
-	if critCount and critCount > 0 then
-		local critWord = critCount == 1 and "Crit" or "Crits"
-		return string.format(
-			"%s (%d %s, %d %s)",
-			formattedAmount,
-			hitCount,
-			hitsWord,
-			critCount,
-			critWord
-		)
-	end
-
-	return string.format("%s (%d %s)", formattedAmount, hitCount, hitsWord)
+	local translations = MikSBT.translations
+	return string.format("%s [%d %s]", formattedAmount, hitCount,
+		translations and translations.MSG_HITS or "Hits")
 end
 
 function OutgoingBatcher:ResolveSettings(isSpell)
@@ -68,7 +57,9 @@ function OutgoingBatcher:Flush(batchKey)
 	self.batches[batchKey] = nil
 
 	local eventKey, settings = self:ResolveSettings(batch.isSpell)
+	MikSBT.Trace:Inc("batch:flush")
 	if not settings then
+		MikSBT.Trace:Inc("batch:nosettings")
 		return
 	end
 	local profile = self.config.getProfile()
@@ -132,7 +123,7 @@ function OutgoingBatcher:Queue(
 		effectTexture = self.config.getSpellTexture(spellID)
 	end
 
-	local batchKey = tostring(spellID or 0)
+	local batchKey = tostring(spellID or 0) .. (isCrit and ":crit" or "")
 	local batch = self.batches[batchKey]
 	if not batch then
 		batch = {

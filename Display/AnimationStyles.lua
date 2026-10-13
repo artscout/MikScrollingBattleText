@@ -473,6 +473,9 @@ local function InitHorizontal(newDisplayEvent, activeDisplayEvents, direction, b
 	end
 
 	local fontStringWidth = newDisplayEvent.fontString:GetStringWidth()
+	if issecretvalue and issecretvalue(fontStringWidth) then
+		fontStringWidth = newDisplayEvent.fontSize * 6
+	end
 	if anchorPoint == "BOTTOMLEFT" then
 		newDisplayEvent.offsetLeft = 0
 		newDisplayEvent.offsetRight = fontStringWidth

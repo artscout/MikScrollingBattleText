@@ -407,3 +407,159 @@ L.BUTTONS["playSound"]				= { label="播放", tooltip="播放选定的声音."}
 L.EDITBOXES["customSoundName"]	= { label="音效名:", tooltip="用来确定音效的名字.\n\nExample: 我的音效"}
 L.EDITBOXES["customSoundPath"]	= { label="音效路径:", tooltip="音效文件的路径.\n\n注意: 如果文件在 MikScrollingBattleText\\Sounds 中的话, 只需要输入文件名就可以.\n\n例如: mySound.ogg "}
 L.EDITBOXES["soundFile"]		= { label="声音文件：", tooltip="事件发生时播放的声音"}
+
+L.MSG_NEW_TRIGGER = "新建触发器"
+L.MSG_TRIGGER_CLASSES = "触发种类"
+L.MSG_MAIN_EVENTS = "主要事件"
+L.MSG_TRIGGER_EXCEPTIONS = "触发器例外"
+L.MSG_EVENT_CONDITIONS = "事件条件"
+L.MSG_SKILLS = "技能"
+L.MSG_SKILL_ALREADY_EXISTS = "技能名字已存在"
+L.MSG_INVALID_SKILL_NAME = "无效的技能名字"
+L.MSG_CONDITION = "条件"
+L.MSG_CONDITIONS = "条件"
+L.CHECKBOXES["allClasses"] = { label="所有职业"}
+L.DROPDOWNS["mainEvent"] = { label="主要事件:"}
+L.DROPDOWNS["triggerCondition"] = { label="条件:", tooltip="测试条件."}
+L.DROPDOWNS["triggerRelation"] = { label="关系:"}
+L.DROPDOWNS["triggerParameter"] = { label="参数:"}
+L.BUTTONS["addTrigger"] = { label="增加新触发器", tooltip="增加新触发器"}
+L.BUTTONS["triggerSettings"] = { tooltip="点击设置触发条件"}
+L.BUTTONS["deleteTrigger"] = { tooltip="点击删除触发器"}
+L.BUTTONS["editTriggerClasses"] = { tooltip="点击编辑触发器使用职业"}
+L.BUTTONS["addMainEvent"] = { label="增加事件", tooltip="任何事件发生并且条件为真时, 触发器会触发, 除非存在例外条件."}
+L.BUTTONS["addTriggerException"] = { label="增加例外", tooltip="当任何一个例外成立时, 触发器不会被触发."}
+L.BUTTONS["editEventConditions"] = { tooltip="点击编辑事件的条件."}
+L.BUTTONS["deleteMainEvent"] = { tooltip="点击删除事件."}
+L.BUTTONS["addEventCondition"] = { label="增加条件", tooltip="当所有条件都成立时, 触发器会触发, 除非例外条件成立."}
+L.BUTTONS["editCondition"] = { tooltip="点击增加条件."}
+L.BUTTONS["deleteCondition"] = { tooltip="点击删除条件."}
+L.BUTTONS["throttleList"] = { label="抑制列表", tooltip="设置指定技能的自定义抑制时间"}
+L.BUTTONS["mergeExclusions"] = { label="防止合并", tooltip="防止指定技能的伤害数值合并"}
+L.BUTTONS["skillSuppressions"] = { label="技能缩写", tooltip="缩写技能名字"}
+L.BUTTONS["skillSubstitutions"] = { label="技能替换", tooltip="用自定义名称替换技能名字"}
+L.BUTTONS["addSkill"] = { label="增加技能", tooltip="增加新技能到列表中"}
+L.BUTTONS["deleteSkill"] = { tooltip="点击删除技能"}
+L.EDITBOXES["skillName"] = { label="技能名称：", tooltip="所增加的技能的名字"}
+L.EDITBOXES["substitutionText"] = { label="替代文本：", tooltip="用来代替技能名字的文本"}
+L.SLIDERS["skillThrottleTime"] = { label="技能抑制显示", tooltip="在设定的秒数中持续使用的技能将只显示一次"}
+L.TRIGGER_DATA["SWING_DAMAGE"] = "平砍伤害"
+L.TRIGGER_DATA["RANGE_DAMAGE"] = "远程伤害"
+L.TRIGGER_DATA["SPELL_DAMAGE"] = "技能伤害"
+L.TRIGGER_DATA["GENERIC_DAMAGE"] = "平砍/远程/技能伤害"
+L.TRIGGER_DATA["SPELL_PERIODIC_DAMAGE"] = "周期性技能伤害(DoT)"
+L.TRIGGER_DATA["DAMAGE_SHIELD"] = "伤害护盾伤害"
+L.TRIGGER_DATA["DAMAGE_SPLIT"] = "分摊伤害"
+L.TRIGGER_DATA["ENVIRONMENTAL_DAMAGE"] = "环境伤害"
+L.TRIGGER_DATA["SWING_MISSED"] = "平砍未命中"
+L.TRIGGER_DATA["RANGE_MISSED"] = "远程未命中"
+L.TRIGGER_DATA["SPELL_MISSED"] = "技能未命中"
+L.TRIGGER_DATA["GENERIC_MISSED"] = "平砍/远程/技能未命中"
+L.TRIGGER_DATA["SPELL_PERIODIC_MISSED"] = "周期性技能未命中"
+L.TRIGGER_DATA["SPELL_DISPEL_FAILED"] = "驱散失败"
+L.TRIGGER_DATA["DAMAGE_SHIELD_MISSED"] = "伤害护盾未命中"
+L.TRIGGER_DATA["SPELL_HEAL"] = "治疗"
+L.TRIGGER_DATA["SPELL_PERIODIC_HEAL"] = "周期性治疗(HoT)"
+L.TRIGGER_DATA["SPELL_ENERGIZE"] = "能量获取"
+L.TRIGGER_DATA["SPELL_PERIODIC_ENERGIZE"] = "周期性能量获取"
+L.TRIGGER_DATA["SPELL_DRAIN"] = "能量消耗"
+L.TRIGGER_DATA["SPELL_PERIODIC_DRAIN"] = "周期性能量消耗"
+L.TRIGGER_DATA["SPELL_LEECH"] = "能量吸取"
+L.TRIGGER_DATA["SPELL_PERIODIC_LEECH"] = "周期性能量吸取"
+L.TRIGGER_DATA["SPELL_INTERRUPT"] = "技能打断"
+L.TRIGGER_DATA["SPELL_AURA_APPLIED"] = "获得光环"
+L.TRIGGER_DATA["SPELL_AURA_REMOVED"] = "光环消失"
+L.TRIGGER_DATA["SPELL_STOLEN"] = "偷取光环"
+L.TRIGGER_DATA["SPELL_DISPEL"] = "光环被驱散"
+L.TRIGGER_DATA["SPELL_AURA_REFRESH"] = "光环刷新"
+L.TRIGGER_DATA["SPELL_AURA_BROKEN_SPELL"] = "光环打破"
+L.TRIGGER_DATA["ENCHANT_APPLIED"] = "附魔效果触发"
+L.TRIGGER_DATA["ENCHANT_REMOVED"] = "附魔效果消失"
+L.TRIGGER_DATA["SPELL_CAST_START"] = "开始施法"
+L.TRIGGER_DATA["SPELL_CAST_SUCCESS"] = "施法成功"
+L.TRIGGER_DATA["SPELL_CAST_FAILED"] = "施法失败"
+L.TRIGGER_DATA["SPELL_SUMMON"] = "召唤"
+L.TRIGGER_DATA["SPELL_CREATE"] = "创造"
+L.TRIGGER_DATA["PARTY_KILL"] = "队友击杀"
+L.TRIGGER_DATA["UNIT_DESTROYED"] = "单位被摧毁"
+L.TRIGGER_DATA["SPELL_EXTRA_ATTACKS"] = "额外攻击"
+L.TRIGGER_DATA["UNIT_HEALTH"] = "生命值改变"
+L.TRIGGER_DATA["UNIT_POWER"] = "法力值改变"
+L.TRIGGER_DATA["sourceName"] = "来源玩家名字"
+L.TRIGGER_DATA["sourceAffiliation"] = "来源玩家联系"
+L.TRIGGER_DATA["sourceReaction"] = "来源玩家反应"
+L.TRIGGER_DATA["sourceControl"] = "来源玩家控制"
+L.TRIGGER_DATA["sourceUnitType"] = "来源玩家类型"
+L.TRIGGER_DATA["recipientName"] = "接受玩家名字"
+L.TRIGGER_DATA["recipientAffiliation"] = "接受玩家联系"
+L.TRIGGER_DATA["recipientReaction"] = "接受玩家反应"
+L.TRIGGER_DATA["recipientControl"] = "接受玩家控制"
+L.TRIGGER_DATA["recipientUnitType"] = "接受玩家类型"
+L.TRIGGER_DATA["skillID"] = "技能 ID"
+L.TRIGGER_DATA["skillName"] = "技能名字"
+L.TRIGGER_DATA["skillSchool"] = "技能类型"
+L.TRIGGER_DATA["extraSkillID"] = "额外技能 ID"
+L.TRIGGER_DATA["extraSkillName"] = "额外技能名字"
+L.TRIGGER_DATA["extraSkillSchool"] = "额外技能类型"
+L.TRIGGER_DATA["amount"] = "总数"
+L.TRIGGER_DATA["overkillAmount"] = "灭绝总数"
+L.TRIGGER_DATA["damageType"] = "伤害类型"
+L.TRIGGER_DATA["resistAmount"] = "抵抗总数"
+L.TRIGGER_DATA["blockAmount"] = "格挡总数"
+L.TRIGGER_DATA["absorbAmount"] = "吸收总数"
+L.TRIGGER_DATA["isCrit"] = "爆击"
+L.TRIGGER_DATA["isGlancing"] = "偏斜"
+L.TRIGGER_DATA["isCrushing"] = "致命攻击"
+L.TRIGGER_DATA["extraAmount"] = "额外总数"
+L.TRIGGER_DATA["missType"] = "未命中类型"
+L.TRIGGER_DATA["hazardType"] = "危害类型"
+L.TRIGGER_DATA["powerType"] = "能量类型"
+L.TRIGGER_DATA["auraType"] = "光环类型"
+L.TRIGGER_DATA["threshold"] = "起点阀值"
+L.TRIGGER_DATA["unitID"] = "玩家 ID"
+L.TRIGGER_DATA["unitReaction"] = "玩家反应"
+L.TRIGGER_DATA["itemID"] = "物品 ID"
+L.TRIGGER_DATA["itemName"] = "物品名字"
+L.TRIGGER_DATA["activeTalents"] = "启用天赋"
+L.TRIGGER_DATA["buffActive"] = "BUFF生效"
+L.TRIGGER_DATA["buffInactive"] = "Buff失效"
+L.TRIGGER_DATA["currentCP"] = "当前连击点"
+L.TRIGGER_DATA["currentPower"] = "当前能量"
+L.TRIGGER_DATA["inCombat"] = "战斗中"
+L.TRIGGER_DATA["recentlyFired"] = "触发器最近被触发"
+L.TRIGGER_DATA["trivialTarget"] = "无效目标"
+L.TRIGGER_DATA["unavailableSkill"] = "不可用技能"
+L.TRIGGER_DATA["warriorStance"] = "战士姿态"
+L.TRIGGER_DATA["zoneName"] = "地区名字"
+L.TRIGGER_DATA["zoneType"] = "地区类型"
+L.TRIGGER_DATA["eq"] = "相等"
+L.TRIGGER_DATA["ne"] = "不相等"
+L.TRIGGER_DATA["like"] = "像"
+L.TRIGGER_DATA["unlike"] = "不像"
+L.TRIGGER_DATA["lt"] = "少于"
+L.TRIGGER_DATA["gt"] = "多于"
+L.TRIGGER_DATA["affiliationMine"] = "我的"
+L.TRIGGER_DATA["affiliationParty"] = "队友"
+L.TRIGGER_DATA["affiliationRaid"] = "团队成员"
+L.TRIGGER_DATA["affiliationOutsider"] = "其他"
+L.TRIGGER_DATA["affiliationTarget"] = TARGET
+L.TRIGGER_DATA["affiliationFocus"] = FOCUS
+L.TRIGGER_DATA["affiliationYou"] = YOU
+L.TRIGGER_DATA["reactionFriendly"] = "友善"
+L.TRIGGER_DATA["reactionNeutral"] = "中立"
+L.TRIGGER_DATA["reactionHostile"] = HOSTILE
+L.TRIGGER_DATA["controlServer"] = "服务器"
+L.TRIGGER_DATA["controlHuman"] = "玩家"
+L.TRIGGER_DATA["unitTypePlayer"] = PLAYER
+L.TRIGGER_DATA["unitTypeNPC"] = "NPC"
+L.TRIGGER_DATA["unitTypePet"] = PET
+L.TRIGGER_DATA["unitTypeGuardian"] = "护卫"
+L.TRIGGER_DATA["unitTypeObject"] = "物体"
+L.TRIGGER_DATA["auraTypeBuff"] = "Buff"
+L.TRIGGER_DATA["auraTypeDebuff"] = "Debuff"
+L.TRIGGER_DATA["zoneTypeArena"] = "竞技场"
+L.TRIGGER_DATA["zoneTypePvP"] = BATTLEGROUND
+L.TRIGGER_DATA["zoneTypeParty"] = "小队副本"
+L.TRIGGER_DATA["zoneTypeRaid"] = "团队副本"
+L.TRIGGER_DATA["booleanTrue"] = "True"
+L.TRIGGER_DATA["booleanFalse"] = "False"

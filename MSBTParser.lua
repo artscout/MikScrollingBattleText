@@ -452,4 +452,7 @@ module.TestFlagsAny					= TestFlagsAny
 module.TestFlagsAll					= TestFlagsAll
 module.Enable						= Enable
 module.Disable						= Disable
+module.RefreshCombatLogAccess		= function() end
+module.IsCombatLogActive			= function() return false end
+module.IsCombatLogUsable			= function() return false end
 

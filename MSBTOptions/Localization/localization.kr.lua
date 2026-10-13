@@ -410,3 +410,157 @@ L.BUTTONS["playSound"]				= { label="재생", tooltip="선택된 효과음을 �
 L.EDITBOXES["customSoundName"]	= { label="소리 이름:", tooltip="이름은 소리를 식별하는데 사용합니다.\n\n사용예: 나의 소리"}
 L.EDITBOXES["customSoundPath"]	= { label="소리 경로:", tooltip="소리 파일이 있는 경로.\n\n노트: 만약 파일이 권장하는 MikScrollingBattleText\\Sounds 폴더 위치에 있으면, 여기엔 오로지 전체 경로 대신 파일 이름을 입력해야 됩니다.\n\n사용예: mySound.ogg "}
 L.EDITBOXES["soundFile"]		= { label="효과음 파일명:", tooltip="이벤트 발생시 재생할 효과음 파일."}
+
+L.MSG_NEW_TRIGGER = "새로운 트리거"
+L.MSG_TRIGGER_CLASSES = "직업 트리거"
+L.MSG_MAIN_EVENTS = "메인 이벤트"
+L.MSG_TRIGGER_EXCEPTIONS = "트리거 예외"
+L.MSG_EVENT_CONDITIONS = "이벤트 조건"
+L.MSG_SKILLS = "기술"
+L.MSG_SKILL_ALREADY_EXISTS = "기술 이름이 이미 존재합니다."
+L.MSG_INVALID_SKILL_NAME = "허용되지 않는 기술 이름입니다."
+L.MSG_CONDITION = "조건"
+L.MSG_CONDITIONS = "조건 (복수)"
+L.CHECKBOXES["allClasses"] = { label="모든 클래스"}
+L.DROPDOWNS["mainEvent"] = { label="메인 이벤트:"}
+L.DROPDOWNS["triggerCondition"] = { label="조건:", tooltip="판별할 조건."}
+L.DROPDOWNS["triggerRelation"] = { label="관계:"}
+L.DROPDOWNS["triggerParameter"] = { label="매개변수 (parameter):"}
+L.BUTTONS["addTrigger"] = { label="새로운 트리거 추가", tooltip="새로운 트리거를 추가합니다."}
+L.BUTTONS["triggerSettings"] = { tooltip="트리거를 설정하려면 클릭하세요."}
+L.BUTTONS["deleteTrigger"] = { tooltip="트리거를 삭제하려면 클릭하세요."}
+L.BUTTONS["editTriggerClasses"] = { tooltip="트리거를 적용할 클래스를 수정하려면 클릭하세요."}
+L.BUTTONS["addMainEvent"] = { label="이벤트 추가", tooltip="이벤트중 어느 하나라도 발생하여 설정한 조건이 만족되면 아래의 예외 조건이 어느 하나라도 만족되지 않는다면 트리거가 발동 됩니다."}
+L.BUTTONS["addTriggerException"] = { label="예외 추가", tooltip="예외 조건중 어느 하나라도 만족되면, 트리거는 발동되지 않습니다."}
+L.BUTTONS["editEventConditions"] = { tooltip="이벤트에 대한 조건을 수정하려면 클릭하세요."}
+L.BUTTONS["deleteMainEvent"] = { tooltip="이벤트를 삭제하려면 클릭하세요."}
+L.BUTTONS["addEventCondition"] = { label="조건 추가", tooltip="이벤트중 어느 하나라도 발생하여 설정한 조건이 만족되면 아래의 예외 조건이 어느 하나라도 만족되지 않는다면 트리거가 발동 됩니다."}
+L.BUTTONS["editCondition"] = { tooltip="조건을 수정하려면 클릭하세요."}
+L.BUTTONS["deleteCondition"] = { tooltip="조건을 삭제하려면 클릭하세요."}
+L.BUTTONS["throttleList"] = { label="기술 출력시간", tooltip="명시한 기술을 출력하는 단위시간을 설정하십시오."}
+L.BUTTONS["mergeExclusions"] = { label="병합 제외", tooltip="명시한 기술을 병합에서 제외됩니다."}
+L.BUTTONS["skillSuppressions"] = { label="제외시킬 기술", tooltip="제외시킬 기술의 이름을 명시합니다."}
+L.BUTTONS["skillSubstitutions"] = { label="기술 이름 대체", tooltip="기술의 이름을 사용자가 입력한 글자로 대체합니다."}
+L.BUTTONS["addSkill"] = { label="기술 추가", tooltip="목록에 새로운 기술을 추가합니다."}
+L.BUTTONS["deleteSkill"] = { tooltip="기술을 삭제하려면 클릭하세요."}
+L.EDITBOXES["skillName"] = { label="기술 이름 입력:", tooltip="추가되는 기술의 이름."}
+L.EDITBOXES["substitutionText"] = { label="대체 텍스트:", tooltip="기술 이름을 대체할 텍스트."}
+L.SLIDERS["skillThrottleTime"] = { label="출력시간 (초)", tooltip="기술을 출력하는 단위시간 (초)."}
+L.TRIGGER_DATA["SWING_DAMAGE"] = "근접 피해"
+L.TRIGGER_DATA["RANGE_DAMAGE"] = "원거리 피해"
+L.TRIGGER_DATA["SPELL_DAMAGE"] = "주문 피해"
+L.TRIGGER_DATA["GENERIC_DAMAGE"] = "피해량"
+L.TRIGGER_DATA["SPELL_PERIODIC_DAMAGE"] = "주기적인 주문 피해 (DoT)"
+L.TRIGGER_DATA["DAMAGE_SHIELD"] = "피해막 피해"
+L.TRIGGER_DATA["DAMAGE_SPLIT"] = "분할 피해"
+L.TRIGGER_DATA["ENVIRONMENTAL_DAMAGE"] = "환경적인 피해"
+L.TRIGGER_DATA["SWING_MISSED"] = "근접 빗나감"
+L.TRIGGER_DATA["RANGE_MISSED"] = "원거리 빗나감"
+L.TRIGGER_DATA["SPELL_MISSED"] = "주문 빗나감"
+L.TRIGGER_DATA["GENERIC_MISSED"] = "빗나감 (적중하지 않음)"
+L.TRIGGER_DATA["SPELL_PERIODIC_MISSED"] = "주기적인 주문 빗나감"
+L.TRIGGER_DATA["SPELL_DISPEL_FAILED"] = "주문 해제 실패"
+L.TRIGGER_DATA["DAMAGE_SHIELD_MISSED"] = "피해막 빗나감"
+L.TRIGGER_DATA["SPELL_HEAL"] = "치유"
+L.TRIGGER_DATA["SPELL_PERIODIC_HEAL"] = "주기적인 치유 (HoT)"
+L.TRIGGER_DATA["SPELL_ENERGIZE"] = "마력 (마나/분노 등) 획득"
+L.TRIGGER_DATA["SPELL_PERIODIC_ENERGIZE"] = "주기적인 마력 (마나/분노 등) 획득"
+L.TRIGGER_DATA["SPELL_DRAIN"] = "마력 (마나/분노 등) 유출"
+L.TRIGGER_DATA["SPELL_PERIODIC_DRAIN"] = "주기적인 (마나/분노 등) 마력 유출"
+L.TRIGGER_DATA["SPELL_LEECH"] = "마력 (마나/분노 등) 착취"
+L.TRIGGER_DATA["SPELL_PERIODIC_LEECH"] = "주기적인 마력 (마나/분노 등) 착취"
+L.TRIGGER_DATA["SPELL_INTERRUPT"] = "주문 차단"
+L.TRIGGER_DATA["SPELL_AURA_APPLIED"] = "오라 받음"
+L.TRIGGER_DATA["SPELL_AURA_REMOVED"] = "오라 사라짐"
+L.TRIGGER_DATA["SPELL_STOLEN"] = "주문 훔치기"
+L.TRIGGER_DATA["SPELL_DISPEL"] = "주문 해제"
+L.TRIGGER_DATA["SPELL_AURA_REFRESH"] = "오라 복원"
+L.TRIGGER_DATA["SPELL_AURA_BROKEN_SPELL"] = "오라 중단됨"
+L.TRIGGER_DATA["ENCHANT_APPLIED"] = "무기 강화 받음"
+L.TRIGGER_DATA["ENCHANT_REMOVED"] = "무기 강화 사라짐"
+L.TRIGGER_DATA["SPELL_CAST_START"] = "시전 시작"
+L.TRIGGER_DATA["SPELL_CAST_SUCCESS"] = "시전 성공"
+L.TRIGGER_DATA["SPELL_CAST_FAILED"] = "시전 실패"
+L.TRIGGER_DATA["SPELL_SUMMON"] = "소환"
+L.TRIGGER_DATA["SPELL_CREATE"] = "창조"
+L.TRIGGER_DATA["PARTY_KILL"] = "결정타"
+L.TRIGGER_DATA["UNIT_DESTROYED"] = "유닛 사라짐"
+L.TRIGGER_DATA["SPELL_EXTRA_ATTACKS"] = "추가 공격"
+L.TRIGGER_DATA["UNIT_HEALTH"] = "생명력 변화"
+L.TRIGGER_DATA["UNIT_POWER"] = "마력 변화"
+L.TRIGGER_DATA["sourceName"] = "이벤트를 제공한 유닛의 이름"
+L.TRIGGER_DATA["sourceAffiliation"] = "이벤트를 제공한 유닛의 소속"
+L.TRIGGER_DATA["sourceReaction"] = "이벤트를 제공한 유닛과의 관계"
+L.TRIGGER_DATA["sourceControl"] = "이벤트를 제공한 유닛의 제어"
+L.TRIGGER_DATA["sourceUnitType"] = "이벤트를 제공한 유닛 유형"
+L.TRIGGER_DATA["recipientName"] = "이벤트를 받은 유닛의 이름"
+L.TRIGGER_DATA["recipientAffiliation"] = "이벤트를 받은 유닛의 소속"
+L.TRIGGER_DATA["recipientReaction"] = "이벤트를 받은 유닛과의 관계"
+L.TRIGGER_DATA["recipientControl"] = "이벤트를 받은 유닛의 제어"
+L.TRIGGER_DATA["recipientUnitType"] = "이벤트를 받은 유닛의 유형"
+L.TRIGGER_DATA["skillID"] = "기술 ID"
+L.TRIGGER_DATA["skillName"] = "기술 이름"
+L.TRIGGER_DATA["skillSchool"] = "기술 속성"
+L.TRIGGER_DATA["extraSkillID"] = "추가 기술 ID"
+L.TRIGGER_DATA["extraSkillName"] = "추가 기술 이름"
+L.TRIGGER_DATA["extraSkillSchool"] = "추가 기술 속성"
+L.TRIGGER_DATA["amount"] = "수치 (양)"
+L.TRIGGER_DATA["overkillAmount"] = "초과 피해"
+L.TRIGGER_DATA["damageType"] = "피해 속성"
+L.TRIGGER_DATA["resistAmount"] = "저항한 피해"
+L.TRIGGER_DATA["blockAmount"] = "방어한 피해"
+L.TRIGGER_DATA["absorbAmount"] = "흡수한 피해"
+L.TRIGGER_DATA["isCrit"] = "치명타"
+L.TRIGGER_DATA["isGlancing"] = "비껴맞음"
+L.TRIGGER_DATA["isCrushing"] = "강타"
+L.TRIGGER_DATA["extraAmount"] = "추가 피해"
+L.TRIGGER_DATA["missType"] = "빗나감 종류"
+L.TRIGGER_DATA["hazardType"] = "위험요소 종류"
+L.TRIGGER_DATA["powerType"] = "마력 종류"
+L.TRIGGER_DATA["auraType"] = "오라 종류"
+L.TRIGGER_DATA["threshold"] = "기준 (양/시간)"
+L.TRIGGER_DATA["unitID"] = "유닛 ID"
+L.TRIGGER_DATA["unitReaction"] = "유닛 반응"
+L.TRIGGER_DATA["activeTalents"] = "활성된 특성"
+L.TRIGGER_DATA["buffActive"] = "활성된 버프"
+L.TRIGGER_DATA["buffInactive"] = "비활성된 버프"
+L.TRIGGER_DATA["currentCP"] = "현재 연계 점수"
+L.TRIGGER_DATA["currentPower"] = "현재 마력 (마나/분노 등)"
+L.TRIGGER_DATA["inCombat"] = "전투중"
+L.TRIGGER_DATA["recentlyFired"] = "최근 발동된 트리거"
+L.TRIGGER_DATA["trivialTarget"] = "무시 대상"
+L.TRIGGER_DATA["unavailableSkill"] = "배우지 않은 기술"
+L.TRIGGER_DATA["warriorStance"] = "전사 태세"
+L.TRIGGER_DATA["zoneName"] = "지역 이름"
+L.TRIGGER_DATA["zoneType"] = "지역 유형"
+L.TRIGGER_DATA["eq"] = "일치함 ( = )"
+L.TRIGGER_DATA["ne"] = "일치하지 않음 ( ≠ )"
+L.TRIGGER_DATA["like"] = "유사함"
+L.TRIGGER_DATA["unlike"] = "유사하지 않음"
+L.TRIGGER_DATA["lt"] = "보다 작음 ( < )"
+L.TRIGGER_DATA["gt"] = "보다 큼 ( > )"
+L.TRIGGER_DATA["affiliationMine"] = "자신의 것"
+L.TRIGGER_DATA["affiliationParty"] = "파티원"
+L.TRIGGER_DATA["affiliationRaid"] = "공격대원"
+L.TRIGGER_DATA["affiliationOutsider"] = "제 3자"
+L.TRIGGER_DATA["affiliationTarget"] = TARGET
+L.TRIGGER_DATA["affiliationFocus"] = "주시 대상"
+L.TRIGGER_DATA["affiliationYou"] = YOU
+L.TRIGGER_DATA["reactionFriendly"] = "우호적인"
+L.TRIGGER_DATA["reactionNeutral"] = "중립적인"
+L.TRIGGER_DATA["reactionHostile"] = "적대적인"
+L.TRIGGER_DATA["controlServer"] = "서버"
+L.TRIGGER_DATA["controlHuman"] = "유저"
+L.TRIGGER_DATA["unitTypePlayer"] = PLAYER
+L.TRIGGER_DATA["unitTypeNPC"] = "NPC"
+L.TRIGGER_DATA["unitTypePet"] = PET
+L.TRIGGER_DATA["unitTypeGuardian"] = "수호물"
+L.TRIGGER_DATA["unitTypeObject"] = "객체"
+L.TRIGGER_DATA["auraTypeBuff"] = "버프"
+L.TRIGGER_DATA["auraTypeDebuff"] = "디버프"
+L.TRIGGER_DATA["zoneTypeArena"] = "투기장"
+L.TRIGGER_DATA["zoneTypePvP"] = BATTLEGROUND
+L.TRIGGER_DATA["zoneTypeParty"] = "5인 던전"
+L.TRIGGER_DATA["zoneTypeRaid"] = "공격대 던전"
+L.TRIGGER_DATA["booleanTrue"] = "True"
+L.TRIGGER_DATA["booleanFalse"] = "False"

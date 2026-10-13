@@ -10,15 +10,20 @@ local MSBTProfiles = MikSBT.Profiles
 local MSBTAnimations = MikSBT.Animations
 local MSBTMain = MikSBT.Main
 local MSBTMedia = MikSBT.Media
+local MSBTParser = MikSBT.Parser
+local MSBTTriggers = MikSBT.Triggers
 local L = MikSBT.translations
 
 local EraseTable = MikSBT.EraseTable
+local GetSkillName = MikSBT.GetSkillName
+local ConvertType = MSBTTriggers.ConvertType
 
 local fonts = MSBTMedia.fonts
 
 local Client = MikSBT.Compatibility.Client
 local IsCataClassic = Client.isCataClassic
 local IsVanillaClassic = Client.isVanillaContent
+local IsClassic = Client.isClassicContent
 
 
 
@@ -30,6 +35,7 @@ local DEFAULT_SCROLL_WIDTH = 40
 local DEFAULT_ANIMATION_STYLE = "Straight"
 local DEFAULT_STICKY_ANIMATION_STYLE = "Pow"
 local DEFAULT_ICON_ALIGN = "Left"
+local FLAG_YOU = 0xF0000000
 local PREVIEW_ICON_PATH = "Interface\\Icons\\INV_Misc_AhnQirajTrinket_03"
 
 local CLASS_NAMES = {}
@@ -1721,7 +1727,7 @@ local function CreateEvent()
 
 
 
-	button = MSBTControls.CreateOptionButton(frame)
+	local button = MSBTControls.CreateOptionButton(frame)
 	objLocale = L.BUTTONS["genericSave"]
 	button:Configure(24, objLocale.label, objLocale.tooltip)
 	button:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -10, 22)
@@ -1959,6 +1965,1384 @@ end
 
 
 
+local function PairsByKeys(t)
+	local temp = {}
+	for k in pairs(t) do temp[#temp + 1] = k end
+	table.sort(temp)
+
+	local position = 0
+	local iterator = function ()
+		position = position + 1
+		if temp[position] == nil then
+			return nil
+		else
+			return temp[position], t[temp[position]]
+		end
+	end
+	return iterator
+end
+
+
+local function CreateClasses()
+	local frame = CreatePopup()
+	frame:SetWidth(318)
+	frame:SetHeight(410)
+	frame.titleFontString:SetText(L.BUTTONS["editTriggerClasses"].label)
+	frame.classCheckboxes = {}
+	local classCheckboxes = frame.classCheckboxes
+
+
+	local checkbox = MSBTControls.CreateCheckbox(frame)
+	local objLocale = L.CHECKBOXES["allClasses"]
+	checkbox:Configure(24, objLocale.label, objLocale.tooltip)
+	checkbox:SetPoint("TOPLEFT", frame, "TOPLEFT", 44, -85)
+	checkbox:SetClickHandler(function(this, isChecked)
+		frame.classes["ALL"] = isChecked and true or nil
+		if (isChecked) then
+			for name, checkFrame in pairs(frame.classCheckboxes) do
+				checkFrame:SetChecked(true)
+				checkFrame:Disable()
+			end
+		else
+			for name, checkFrame in pairs(classCheckboxes) do
+				checkFrame:Enable()
+				checkFrame:SetChecked(frame.classes[checkFrame.associatedClass])
+			end
+		end
+		if (frame.updateHandler) then
+			frame.updateHandler()
+		end
+	end)
+	frame.allClassesCheckbox = checkbox
+
+	local anchor = checkbox
+	for class in string.gmatch(classString, "[^ ]+") do
+		checkbox = MSBTControls.CreateCheckbox(frame)
+		checkbox:Configure(24, CLASS_NAMES[class], nil)
+		checkbox:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", anchor == frame.allClassesCheckbox and 20 or 0, anchor == frame.allClassesCheckbox and -10 or 0)
+		checkbox:SetClickHandler(function(this, isChecked)
+			frame.classes[this.associatedClass] = isChecked and true or nil
+			if (frame.updateHandler) then
+				frame.updateHandler()
+			end
+		end)
+		checkbox.associatedClass = class
+		anchor = checkbox
+		classCheckboxes[class .. "Checkbox"] = checkbox
+	end
+
+	return frame
+end
+
+
+local function ShowClasses(configTable)
+	if (not configTable or not configTable.anchorFrame or not configTable.parentFrame or not configTable.classes) then return end
+
+	if (not popupFrames.classesFrame) then popupFrames.classesFrame = CreateClasses() end
+
+	local frame = popupFrames.classesFrame
+	ChangePopupParent(frame, configTable.parentFrame)
+
+	if (configTable.classes["ALL"]) then
+		frame.allClassesCheckbox:SetChecked(true)
+		for name, checkFrame in pairs(frame.classCheckboxes) do
+			checkFrame:SetChecked(true)
+			checkFrame:Disable()
+		end
+	else
+		frame.allClassesCheckbox:SetChecked(false)
+		for name, checkFrame in pairs(frame.classCheckboxes) do
+			checkFrame:Enable()
+			checkFrame:SetChecked(configTable.classes[checkFrame.associatedClass])
+		end
+	end
+
+	frame.classes = configTable.classes
+	frame.updateHandler = configTable.updateHandler
+	frame.hideHandler = configTable.hideHandler
+	frame:ClearAllPoints()
+	frame:SetPoint(configTable.anchorPoint or "TOPLEFT", configTable.anchorFrame, configTable.relativePoint or "BOTTOMLEFT")
+	frame:Show()
+	frame:Raise()
+end
+
+
+local function ConditionDropdownOnChange(this, id)
+	local frame = popupFrames.triggerConditionFrame
+	local conditionData = popupFrames.triggerFrame.conditionData[id]
+
+	frame.parameterEditbox:Hide()
+	frame.parameterSlider:Hide()
+	frame.parameterDropdown:Hide()
+
+	frame.relationDropdown:Clear()
+	if (conditionData) then
+		if (conditionData.relations) then
+			for relationType, relationName in pairs(conditionData.relations) do
+				frame.relationDropdown:AddItem(relationName, relationType)
+			end
+			frame.relationDropdown:SetSelectedID(conditionData.defaultRelation or "eq")
+		end
+
+		local control
+		if (conditionData.controlType == "editbox") then
+			control = frame.parameterEditbox
+			control:Show()
+			control:SetText(conditionData.default or "")
+		elseif (conditionData.controlType == "slider") then
+			control = frame.parameterSlider
+			control:Show()
+			control:SetMinMaxValues(conditionData.minValue, conditionData.maxValue)
+			control:SetValueStep(conditionData.step)
+			control:SetValue(conditionData.default or conditionData.minValue)
+		elseif (conditionData.controlType == "dropdown") then
+			control = frame.parameterDropdown
+			control:Show()
+			control:Clear()
+			for itemValue, itemName in pairs(conditionData.items) do
+				control:AddItem(itemName, itemValue)
+			end
+			control:Sort()
+			control:SetSelectedID(conditionData.default)
+
+		end
+	end
+end
+
+
+local function CreateTriggerCondition()
+	local frame = CreatePopup()
+	frame:SetWidth(398)
+	frame:SetHeight(330)
+	frame.titleFontString:SetText(L.MSG_CONDITION)
+
+	local dropdown = MSBTControls.CreateDropdown(frame)
+	local objLocale = L.DROPDOWNS["triggerCondition"]
+	dropdown:Configure(200, objLocale.label, objLocale.tooltip)
+	dropdown:SetListboxHeight(200)
+	dropdown:SetListboxWidth(200)
+	dropdown:SetPoint("TOPLEFT", frame, "TOPLEFT", 44, -85)
+	dropdown:SetChangeHandler(ConditionDropdownOnChange)
+	frame.conditionDropdown = dropdown
+
+	local dropdown = MSBTControls.CreateDropdown(frame)
+	local objLocale = L.DROPDOWNS["triggerRelation"]
+	dropdown:Configure(120, objLocale.label, objLocale.tooltip)
+	dropdown:SetListboxHeight(200)
+	dropdown:SetPoint("TOPLEFT", frame.conditionDropdown, "BOTTOMLEFT", 0, -20)
+	frame.relationDropdown = dropdown
+
+	local editbox = MSBTControls.CreateEditbox(frame)
+	local objLocale = L.DROPDOWNS["triggerParameter"]
+	editbox:Configure(0, objLocale.label, objLocale.tooltip)
+	editbox:SetPoint("TOPLEFT", dropdown, "BOTTOMLEFT", 0, -20)
+	editbox:SetPoint("RIGHT", frame, "RIGHT", -59, 0)
+	frame.parameterEditbox = editbox
+
+	local slider = MSBTControls.CreateSlider(frame)
+	local objLocale = L.DROPDOWNS["triggerParameter"]
+	slider:Configure(180, objLocale.label, objLocale.tooltip)
+	slider:SetPoint("TOPLEFT", dropdown, "BOTTOMLEFT", 0, -30)
+	frame.parameterSlider = slider
+
+	local dropdown = MSBTControls.CreateDropdown(frame)
+	local objLocale = L.DROPDOWNS["triggerParameter"]
+	dropdown:Configure(150, objLocale.label, objLocale.tooltip)
+	dropdown:SetListboxHeight(120)
+	dropdown:SetPoint("TOPLEFT", frame.relationDropdown, "BOTTOMLEFT", 0, -20)
+	frame.parameterDropdown = dropdown
+
+	local button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericSave"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -10, 22)
+	button:SetClickHandler(function(this)
+		EraseTable(returnSettings)
+		returnSettings.conditionType = frame.conditionDropdown:GetSelectedID()
+		returnSettings.conditionRelation = frame.relationDropdown:GetSelectedID()
+		if (frame.parameterEditbox:IsShown()) then
+			returnSettings.conditionValue = frame.parameterEditbox:GetText()
+		elseif (frame.parameterSlider:IsShown()) then
+			returnSettings.conditionValue = frame.parameterSlider:GetValue()
+		elseif (frame.parameterDropdown:IsShown()) then
+			returnSettings.conditionValue = frame.parameterDropdown:GetSelectedID()
+		end
+		frame:Hide()
+		if frame.saveHandler then
+			frame.saveHandler(returnSettings, frame.saveArg1)
+		end
+	end)
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericCancel"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 10, 22)
+	button:SetClickHandler(function(this)
+		frame:Hide()
+	end)
+
+	return frame
+end
+
+
+local function ShowTriggerCondition(configTable)
+	if (not configTable or not configTable.anchorFrame or not configTable.parentFrame) then return end
+
+	if (not popupFrames.triggerConditionFrame) then popupFrames.triggerConditionFrame = CreateTriggerCondition() end
+
+	local frame = popupFrames.triggerConditionFrame
+	ChangePopupParent(frame, configTable.parentFrame)
+
+	frame.conditionDropdown:Clear()
+	for conditionType in string.gmatch(configTable.availableConditions, "[^%s]+") do
+		frame.conditionDropdown:AddItem(L.TRIGGER_DATA[conditionType] or conditionType, conditionType)
+	end
+	frame.conditionDropdown:Sort()
+	frame.conditionDropdown:SetSelectedID(configTable.conditionType)
+	ConditionDropdownOnChange(frame.conditionDropdown, configTable.conditionType)
+
+	frame.relationDropdown:SetSelectedID(configTable.conditionRelation)
+
+	local conditionData = popupFrames.triggerFrame.conditionData[configTable.conditionType]
+	local conditionValue = configTable.conditionValue
+	if (type(conditionValue) == "boolean") then conditionValue = tostring(conditionValue) end
+	if (conditionData.controlType == "editbox") then
+		frame.parameterEditbox:SetText(conditionValue)
+	elseif (conditionData.controlType == "slider") then
+		frame.parameterSlider:SetValue(conditionValue)
+	elseif (conditionData.controlType == "dropdown") then
+		frame.parameterDropdown:SetSelectedID(conditionValue)
+	end
+
+	frame.saveHandler = configTable.saveHandler
+	frame.saveArg1 = configTable.saveArg1
+	frame.hideHandler = configTable.hideHandler
+	frame:ClearAllPoints()
+	frame:SetPoint(configTable.anchorPoint or "TOPLEFT", configTable.anchorFrame, configTable.relativePoint or "BOTTOMLEFT")
+	frame:Show()
+	frame:Raise()
+end
+
+
+local function EnableMainEventControls()
+	for name, frame in pairs(popupFrames.mainEventFrame.controls) do
+		if (frame.Enable) then frame:Enable() end
+	end
+end
+
+
+local function UpdateMainEventConditions()
+	local frame = popupFrames.mainEventFrame
+	frame.conditionsListbox:Clear()
+	for x = 1, #frame.eventConditions, 3 do
+		frame.conditionsListbox:AddItem(x)
+	end
+end
+
+
+local function SaveMainEventCondition(settings, conditionNum)
+	local frame = popupFrames.mainEventFrame
+	frame.eventConditions[conditionNum] = settings.conditionType
+	frame.eventConditions[conditionNum + 1] = settings.conditionRelation
+	frame.eventConditions[conditionNum + 2] = settings.conditionValue
+	UpdateMainEventConditions()
+end
+
+
+local function DeleteConditionButtonOnClick(this)
+	local frame = popupFrames.mainEventFrame
+	local line = this:GetParent()
+	table.remove(frame.eventConditions, line.conditionNum)
+	table.remove(frame.eventConditions, line.conditionNum)
+	table.remove(frame.eventConditions, line.conditionNum)
+	UpdateMainEventConditions()
+end
+
+
+local function EditConditionButtonOnClick(this)
+	local frame = popupFrames.mainEventFrame
+	local line = this:GetParent()
+	local eventType = frame.mainEventDropdown:GetSelectedID()
+	local conditionData = popupFrames.triggerFrame.eventConditionData[eventType]
+
+	EraseTable(tempConfig)
+	tempConfig.conditionType = frame.eventConditions[line.conditionNum]
+	tempConfig.conditionRelation = frame.eventConditions[line.conditionNum + 1]
+	tempConfig.conditionValue = frame.eventConditions[line.conditionNum + 2]
+	tempConfig.availableConditions = conditionData and conditionData.availableConditions
+	tempConfig.saveHandler = SaveMainEventCondition
+	tempConfig.saveArg1 = line.conditionNum
+	tempConfig.parentFrame = frame
+	tempConfig.anchorFrame = this
+	tempConfig.anchorPoint = "BOTTOMLEFT"
+	tempConfig.relativePoint = "TOPLEFT"
+	tempConfig.hideHandler = EnableMainEventControls
+	DisableControls(frame.controls)
+	ShowTriggerCondition(tempConfig)
+end
+
+
+local function CreateMainEventConditionsLine(this)
+	local controls = popupFrames.mainEventFrame.controls
+	local frame = CreateFrame("Button", nil, this)
+	frame:EnableMouse(false)
+
+	local button = MSBTControls.CreateIconButton(frame, "Configure")
+	local objLocale = L.BUTTONS["editCondition"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("LEFT", frame, "LEFT", 0, 0)
+	button:SetClickHandler(EditConditionButtonOnClick)
+	frame.editConditionButton = button
+	controls[#controls + 1] = button
+
+	button = MSBTControls.CreateIconButton(frame, "Delete")
+	objLocale = L.BUTTONS["deleteCondition"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", frame, "RIGHT", -10, -5)
+	button:SetClickHandler(DeleteConditionButtonOnClick)
+	controls[#controls + 1] = button
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("LEFT", frame.editConditionButton, "RIGHT", 5, 0)
+	fontString:SetPoint("RIGHT", controls[#controls], "LEFT", -10, 0)
+	fontString:SetJustifyH("LEFT")
+	fontString:SetTextColor(1, 1, 1)
+	frame.conditionFontString = fontString
+
+	return frame
+end
+
+
+local function DisplayMainEventConditionsLine(this, line, key, isSelected)
+	line.conditionNum = key
+
+	local frame = popupFrames.mainEventFrame
+	local conditionType = frame.eventConditions[key]
+	local conditionData = popupFrames.triggerFrame.conditionData[conditionType]
+	local relation = conditionData and conditionData.relations[frame.eventConditions[key + 1]]
+
+	local parameter = frame.eventConditions[key + 2]
+	if (type(parameter) == "boolean") then parameter = tostring(parameter) end
+	if (conditionData and conditionData.controlType == "dropdown") then parameter = conditionData.items[parameter] end
+
+	local conditionText = L.TRIGGER_DATA[conditionType] or conditionType
+	if (relation) then conditionText = conditionText .. " - " .. relation end
+	if (parameter) then conditionText = conditionText .. " - " .. parameter end
+
+	line.conditionFontString:SetText(conditionText)
+end
+
+
+local function CreateMainEvent()
+	local frame = CreatePopup()
+	frame:SetWidth(498)
+	frame:SetHeight(395)
+	frame.titleFontString:SetText(L.DROPDOWNS["mainEvent"].label)
+	frame.controls = {}
+	local controls = frame.controls
+
+	local dropdown = MSBTControls.CreateDropdown(frame)
+	local objLocale = L.DROPDOWNS["mainEvent"]
+	dropdown:Configure(200, objLocale.label, nil)
+	dropdown:SetListboxHeight(200)
+	dropdown:SetPoint("TOPLEFT", frame, "TOPLEFT", 44, -85)
+	dropdown:SetChangeHandler(function(this, id)
+		EraseTable(frame.eventConditions)
+		local conditionData = popupFrames.triggerFrame.eventConditionData[id]
+		if (conditionData and conditionData.defaultConditions and conditionData.defaultConditions ~= "") then
+			for conditionEntry in string.gmatch(conditionData.defaultConditions .. ";;", "(.-);;") do
+				frame.eventConditions[#frame.eventConditions + 1] = ConvertType(conditionEntry)
+			end
+		end
+		UpdateMainEventConditions()
+	end)
+	for eventType in pairs(popupFrames.triggerFrame.eventConditionData) do
+		if not MSBTTriggers.IsCLEUTriggerMainEvent(eventType) then
+			dropdown:AddItem(L.TRIGGER_DATA[eventType] or eventType, eventType)
+		end
+	end
+	dropdown:Sort()
+	frame.mainEventDropdown = dropdown
+	controls[#controls + 1] = dropdown
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("TOPLEFT", frame.mainEventDropdown, "BOTTOMLEFT", 0, -30)
+	fontString:SetText(L.MSG_EVENT_CONDITIONS .. ":")
+	frame.triggerConditionsLabel = fontString
+
+	local button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["addEventCondition"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("LEFT", frame.triggerConditionsLabel, "RIGHT", 10, 0)
+	button:SetClickHandler(function(this)
+		local eventType = frame.mainEventDropdown:GetSelectedID()
+		local conditionData = popupFrames.triggerFrame.eventConditionData[eventType]
+		local conditionType, conditionRelation, conditionValue
+		if (conditionData and conditionData.defaultConditions ~= "") then
+			_, _, conditionType, conditionRelation, conditionValue = string.find(conditionData.defaultConditions, "(.-);;(.-);;(.-)")
+			conditionValue = conditionValue and ConvertType(conditionValue)
+			if (type(conditionValue == "boolean")) then
+				conditionValue = tostring(conditionValue)
+			end
+		end
+		EraseTable(tempConfig)
+		tempConfig.conditionType = conditionType or "skillName"
+		tempConfig.conditionRelation = conditionRelation or "eq"
+		tempConfig.conditionValue = conditionValue or ""
+		tempConfig.availableConditions = conditionData and conditionData.availableConditions
+		tempConfig.saveHandler = SaveMainEventCondition
+		tempConfig.saveArg1 = #frame.eventConditions + 1
+		tempConfig.parentFrame = frame
+		tempConfig.anchorFrame = this
+		tempConfig.anchorPoint = "BOTTOMLEFT"
+		tempConfig.relativePoint = "TOPLEFT"
+		tempConfig.hideHandler = EnableMainEventControls
+		DisableControls(frame.controls)
+		ShowTriggerCondition(tempConfig)
+	end)
+	controls[#controls + 1] = button
+
+	local listbox = MSBTControls.CreateListbox(frame)
+	listbox:Configure(400, 100, 25)
+	listbox:SetPoint("TOPLEFT", frame.triggerConditionsLabel, "BOTTOMLEFT", 10, -10)
+	listbox:SetCreateLineHandler(CreateMainEventConditionsLine)
+	listbox:SetDisplayHandler(DisplayMainEventConditionsLine)
+	frame.conditionsListbox = listbox
+	controls[#controls + 1] = listbox
+
+	local button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericSave"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -10, 22)
+	button:SetClickHandler(function(this)
+		EraseTable(returnSettings)
+		returnSettings.eventType = frame.mainEventDropdown:GetSelectedID()
+		returnSettings.eventConditions = {}
+		for _, conditionEntry in ipairs(frame.eventConditions) do
+			returnSettings.eventConditions[#returnSettings.eventConditions + 1] = conditionEntry
+		end
+		frame:Hide()
+		if frame.saveHandler then
+			frame.saveHandler(returnSettings, frame.saveArg1)
+		end
+	end)
+	controls[#controls + 1] = button
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericCancel"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 10, 22)
+	button:SetClickHandler(function(this)
+		frame:Hide()
+	end)
+	controls[#controls + 1] = button
+
+	frame.eventConditions = {}
+
+	return frame
+end
+
+
+local function ShowMainEvent(configTable)
+	if (not configTable or not configTable.anchorFrame or not configTable.parentFrame) then return end
+
+	if (not popupFrames.mainEventFrame) then popupFrames.mainEventFrame = CreateMainEvent() end
+
+	local frame = popupFrames.mainEventFrame
+	ChangePopupParent(frame, configTable.parentFrame)
+
+	local selectedEventType = configTable.eventType
+	if MSBTTriggers.IsCLEUTriggerMainEvent(selectedEventType) then
+		selectedEventType = "UNIT_HEALTH"
+	end
+	frame.mainEventDropdown:SetSelectedID(selectedEventType)
+
+	EraseTable(frame.eventConditions)
+	for _, conditionEntry in ipairs(configTable.eventConditions) do
+		frame.eventConditions[#frame.eventConditions + 1] = conditionEntry
+	end
+	UpdateMainEventConditions()
+
+	frame.saveHandler = configTable.saveHandler
+	frame.saveArg1 = configTable.saveArg1
+	frame.hideHandler = configTable.hideHandler
+	frame:ClearAllPoints()
+	frame:SetPoint(configTable.anchorPoint or "TOPLEFT", configTable.anchorFrame, configTable.relativePoint or "BOTTOMLEFT")
+	frame:Show()
+	frame:Raise()
+end
+
+
+local function UpdateClassesText()
+	local frame = popupFrames.triggerFrame
+
+	local selectedClasses = ""
+	if (frame.classes["ALL"]) then
+		selectedClasses = L.CHECKBOXES["allClasses"].label
+	else
+		for className in pairs(frame.classes) do
+			selectedClasses = selectedClasses .. CLASS_NAMES[className] .. ", "
+		end
+
+		selectedClasses = string.sub(selectedClasses, 1, -3)
+	end
+
+	frame.classesFontString:SetText(selectedClasses)
+end
+
+
+local function UpdateMainEvents()
+	local frame = popupFrames.triggerFrame
+	frame.mainEventsListbox:Clear()
+	for index, mainEvent in pairs(frame.mainEvents) do
+		frame.mainEventsListbox:AddItem(index)
+	end
+end
+
+
+local function UpdateExceptions()
+	local frame = popupFrames.triggerFrame
+	frame.exceptionsListbox:Clear()
+	for x = 1, #frame.exceptions, 3 do
+		frame.exceptionsListbox:AddItem(x)
+	end
+end
+
+
+local function EnableTriggerControls()
+	for name, frame in pairs(popupFrames.triggerFrame.controls) do
+		if (frame.Enable) then frame:Enable() end
+	end
+end
+
+
+local function SaveMainEvent(settings, eventNum)
+	local frame = popupFrames.triggerFrame
+	frame.mainEvents[eventNum] = settings.eventType
+	frame.eventConditions[eventNum] = settings.eventConditions
+	UpdateMainEvents()
+end
+
+
+local function SaveException(settings, exceptionNum)
+	local frame = popupFrames.triggerFrame
+	frame.exceptions[exceptionNum] = settings.conditionType
+	frame.exceptions[exceptionNum + 1] = settings.conditionRelation
+	frame.exceptions[exceptionNum + 2] = settings.conditionValue
+	UpdateExceptions()
+end
+
+
+local function EditMainEventButtonOnClick(this)
+	local frame = popupFrames.triggerFrame
+	local line = this:GetParent()
+
+	EraseTable(tempConfig)
+	tempConfig.eventType = frame.mainEvents[line.eventNum]
+	tempConfig.eventConditions = frame.eventConditions[line.eventNum]
+	tempConfig.saveHandler = SaveMainEvent
+	tempConfig.saveArg1 = line.eventNum
+	tempConfig.parentFrame = frame
+	tempConfig.anchorFrame = this
+	tempConfig.hideHandler = EnableTriggerControls
+	DisableControls(frame.controls)
+	ShowMainEvent(tempConfig)
+end
+
+
+local function EditExceptionButtonOnClick(this)
+	local frame = popupFrames.triggerFrame
+	local line = this:GetParent()
+
+	EraseTable(tempConfig)
+	tempConfig.conditionType = frame.exceptions[line.exceptionNum]
+	tempConfig.conditionRelation = frame.exceptions[line.exceptionNum + 1]
+	tempConfig.conditionValue = frame.exceptions[line.exceptionNum + 2]
+	tempConfig.availableConditions = frame.availableExceptions
+	tempConfig.saveHandler = SaveException
+	tempConfig.saveArg1 = line.exceptionNum
+	tempConfig.parentFrame = frame
+	tempConfig.anchorFrame = this
+	tempConfig.anchorPoint = "BOTTOMLEFT"
+	tempConfig.relativePoint = "TOPLEFT"
+	tempConfig.hideHandler = EnableTriggerControls
+	DisableControls(frame.controls)
+	ShowTriggerCondition(tempConfig)
+end
+
+
+local function DeleteMainEventButtonOnClick(this)
+	local frame = popupFrames.triggerFrame
+	local line = this:GetParent()
+	table.remove(frame.mainEvents, line.eventNum)
+	table.remove(frame.eventConditions, line.eventNum)
+	UpdateMainEvents()
+end
+
+
+local function DeleteExceptionButtonOnClick(this)
+	local frame = popupFrames.triggerFrame
+	local line = this:GetParent()
+	table.remove(frame.exceptions, line.exceptionNum)
+	table.remove(frame.exceptions, line.exceptionNum)
+	table.remove(frame.exceptions, line.exceptionNum)
+	UpdateExceptions()
+end
+
+
+local function CreateMainEventsLine(this)
+	local controls = popupFrames.triggerFrame.controls
+	local frame = CreateFrame("Button", nil, this)
+	frame:EnableMouse(false)
+
+	local button = MSBTControls.CreateIconButton(frame, "Configure")
+	local objLocale = L.BUTTONS["editEventConditions"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("LEFT", frame, "LEFT", 0, 0)
+	button:SetClickHandler(EditMainEventButtonOnClick)
+	frame.editEventButton = button
+	controls[#controls + 1] = button
+
+	button = MSBTControls.CreateIconButton(frame, "Delete")
+	objLocale = L.BUTTONS["deleteMainEvent"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+	button:SetClickHandler(DeleteMainEventButtonOnClick)
+	controls[#controls + 1] = button
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("LEFT", frame.editEventButton, "RIGHT", 5, 0)
+	fontString:SetPoint("RIGHT", controls[#controls], "LEFT", -10, 0)
+	fontString:SetJustifyH("LEFT")
+	fontString:SetTextColor(1, 1, 1)
+	frame.eventFontString = fontString
+
+	return frame
+end
+
+
+local function CreateExceptionsLine(this)
+	local controls = popupFrames.triggerFrame.controls
+	local frame = CreateFrame("Button", nil, this)
+	frame:EnableMouse(false)
+
+	local button = MSBTControls.CreateIconButton(frame, "Configure")
+	local objLocale = L.BUTTONS["editCondition"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("LEFT", frame, "LEFT", 0, 0)
+	button:SetClickHandler(EditExceptionButtonOnClick)
+	frame.editExceptionButton = button
+	controls[#controls + 1] = button
+
+	button = MSBTControls.CreateIconButton(frame, "Delete")
+	objLocale = L.BUTTONS["deleteCondition"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", frame, "RIGHT", -10, -5)
+	button:SetClickHandler(DeleteExceptionButtonOnClick)
+	controls[#controls + 1] = button
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("LEFT", frame.editExceptionButton, "RIGHT", 5, 0)
+	fontString:SetPoint("RIGHT", controls[#controls], "LEFT", -10, 0)
+	fontString:SetJustifyH("LEFT")
+	fontString:SetTextColor(1, 1, 1)
+	frame.exceptionFontString = fontString
+
+	return frame
+end
+
+
+local function DisplayMainEventsLine(this, line, key, isSelected)
+	line.eventNum = key
+
+	local frame = popupFrames.triggerFrame
+	local eventType = frame.mainEvents[key]
+	local eventText = L.TRIGGER_DATA[eventType] or UNKNOWN
+	local eventConditions = frame.eventConditions[key]
+
+	local numConditions = #eventConditions / 3
+	eventText = eventText .. " - " .. numConditions .. " " .. (numConditions == 1 and L.MSG_CONDITION or L.MSG_CONDITIONS)
+
+	line.eventFontString:SetText(eventText)
+end
+
+
+local function DisplayExceptionsLine(this, line, key, isSelected)
+	line.exceptionNum = key
+
+	local frame = popupFrames.triggerFrame
+	local exceptionType = frame.exceptions[key]
+	local conditionData = frame.conditionData[exceptionType]
+	local relation = conditionData.relations[frame.exceptions[key + 1]]
+
+	local parameter = frame.exceptions[key + 2]
+	if (type(parameter) == "boolean") then parameter = tostring(parameter) end
+	if (conditionData.controlType == "dropdown") then parameter = conditionData.items[parameter] end
+
+	local exceptionText = L.TRIGGER_DATA[exceptionType] or exceptionType
+	if (relation) then exceptionText = exceptionText .. " - " .. relation end
+	if (parameter) then exceptionText = exceptionText .. " - " .. parameter end
+
+	line.exceptionFontString:SetText(exceptionText)
+end
+
+
+local function CreateTriggerPopup()
+	local frame = CreatePopup()
+	frame:SetWidth(548)
+	frame:SetHeight(520)
+	frame.controls = {}
+	local controls = frame.controls
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("TOPLEFT", frame, "TOPLEFT", 44, -85)
+	fontString:SetText(L.MSG_TRIGGER_CLASSES .. ":")
+	frame.classesLabel = fontString
+
+	local button = MSBTControls.CreateIconButton(frame, "Configure")
+	local objLocale = L.BUTTONS["editTriggerClasses"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("TOPLEFT", frame.classesLabel, "BOTTOMLEFT", 10, -5)
+	button:SetClickHandler(function(this)
+		EraseTable(tempConfig)
+		tempConfig.parentFrame = frame
+		tempConfig.anchorFrame = this
+		tempConfig.classes = frame.classes
+		tempConfig.updateHandler = UpdateClassesText
+		tempConfig.hideHandler = EnableTriggerControls
+		DisableControls(controls)
+		ShowClasses(tempConfig)
+	end)
+	controls[#controls + 1] = button
+
+	fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("LEFT", controls[#controls], "RIGHT", 10, -5)
+	fontString:SetPoint("RIGHT", frame, "RIGHT", -44, 0)
+	fontString:SetHeight(30)
+	fontString:SetJustifyH("LEFT")
+	fontString:SetJustifyV("TOP")
+	fontString:SetTextColor(1, 1, 1)
+	frame.classesFontString = fontString
+
+	fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("TOPLEFT", controls[#controls], "BOTTOMLEFT", -10, -15)
+	fontString:SetText(L.MSG_MAIN_EVENTS .. ":")
+	frame.mainEventsLabel = fontString
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["addMainEvent"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("LEFT", frame.mainEventsLabel, "RIGHT", 10, 0)
+	button:SetClickHandler(function(this)
+		EraseTable(tempConfig)
+		tempConfig.eventType = "UNIT_HEALTH"
+		tempConfig.eventConditions = {"unitID", "eq", "player", "threshold", "lt", 20}
+		tempConfig.saveHandler = SaveMainEvent
+		tempConfig.saveArg1 = #frame.mainEvents + 1
+		tempConfig.parentFrame = frame
+		tempConfig.anchorFrame = this
+		tempConfig.hideHandler = EnableTriggerControls
+		DisableControls(frame.controls)
+		ShowMainEvent(tempConfig)
+	end)
+	controls[#controls + 1] = button
+
+	local listbox = MSBTControls.CreateListbox(frame)
+	listbox:Configure(450, 100, 25)
+	listbox:SetPoint("TOPLEFT", frame.mainEventsLabel, "BOTTOMLEFT", 10, -10)
+	listbox:SetCreateLineHandler(CreateMainEventsLine)
+	listbox:SetDisplayHandler(DisplayMainEventsLine)
+	frame.mainEventsListbox = listbox
+	controls[#controls + 1] = listbox
+
+	fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("TOPLEFT", frame.mainEventsListbox, "BOTTOMLEFT", -10, -15)
+	fontString:SetText(L.MSG_TRIGGER_EXCEPTIONS .. ":")
+	frame.triggerExceptionsLabel = fontString
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["addTriggerException"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("LEFT", frame.triggerExceptionsLabel, "RIGHT", 10, 0)
+	button:SetClickHandler(function(this)
+		EraseTable(tempConfig)
+		tempConfig.conditionType = "recentlyFired"
+		tempConfig.conditionRelation = "lt"
+		tempConfig.conditionValue = 5
+		tempConfig.availableConditions = frame.availableExceptions
+		tempConfig.saveHandler = SaveException
+		tempConfig.saveArg1 = #frame.exceptions + 1
+		tempConfig.parentFrame = frame
+		tempConfig.anchorFrame = this
+		tempConfig.anchorPoint = "BOTTOMLEFT"
+		tempConfig.relativePoint = "TOPLEFT"
+		tempConfig.hideHandler = EnableTriggerControls
+		DisableControls(frame.controls)
+		ShowTriggerCondition(tempConfig)
+	end)
+	controls[#controls + 1] = button
+
+	listbox = MSBTControls.CreateListbox(frame)
+	listbox:Configure(450, 100, 25)
+	listbox:SetPoint("TOPLEFT", frame.triggerExceptionsLabel, "BOTTOMLEFT", 10, -10)
+	listbox:SetCreateLineHandler(CreateExceptionsLine)
+	listbox:SetDisplayHandler(DisplayExceptionsLine)
+	frame.exceptionsListbox = listbox
+	controls[#controls + 1] = listbox
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericSave"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -10, 22)
+	button:SetClickHandler(function(this)
+		EraseTable(returnSettings)
+		if not frame.classes["ALL"] then
+			local sortedClasses = frame.sortedClasses
+			EraseTable(sortedClasses)
+			for class in pairs(frame.classes) do
+				sortedClasses[#sortedClasses + 1] = class
+			end
+			table.sort(sortedClasses)
+			returnSettings.classes = table.concat(sortedClasses, ",")
+		end
+		if next(frame.mainEvents) then
+			local events = ""
+			for eventNum, eventType in ipairs(frame.mainEvents) do
+				events = events .. eventType .. "{"
+				if next(frame.eventConditions[eventNum]) then
+					for _, conditionEntry in ipairs(frame.eventConditions[eventNum]) do
+						events = events .. tostring(conditionEntry) .. ";;"
+					end
+					events = string.sub(events, 1, -3)
+				end
+				events = events .. "}&&"
+			end
+			returnSettings.mainEvents = string.sub(events, 1, -3)
+		end
+		if next(frame.exceptions) then
+			local exceptions = ""
+			for x = 1, #frame.exceptions, 3 do
+				exceptions = exceptions .. string.format("%s;;%s;;%s;;", tostring(frame.exceptions[x]), tostring(frame.exceptions[x + 1]), tostring(frame.exceptions[x + 2]))
+			end
+			returnSettings.exceptions = string.sub(exceptions, 1, -3)
+		end
+		frame:Hide()
+		if frame.saveHandler then
+			frame.saveHandler(returnSettings, frame.saveArg1)
+		end
+	end)
+	controls[#controls + 1] = button
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericCancel"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 10, 22)
+	button:SetClickHandler(function(this)
+		frame:Hide()
+	end)
+	controls[#controls + 1] = button
+
+	frame.classes = {}
+	frame.sortedClasses = {}
+	frame.mainEvents = {}
+	frame.eventConditions = {}
+	frame.exceptions = {}
+	frame.sortedKeys = {}
+
+	local objLocale = L.TRIGGER_DATA
+	local equalityRelations = {eq = objLocale["eq"]}
+	local stringRelations = {eq = objLocale["eq"], ne = objLocale["ne"], like = objLocale["like"], unlike = objLocale["unlike"]}
+	local numberRelations = {eq = objLocale["eq"], ne = objLocale["ne"], lt = objLocale["lt"], gt = objLocale["gt"]}
+	local booleanRelations = {eq = objLocale["eq"], ne = objLocale["ne"]}
+	local lessThanRelations = {lt = objLocale["lt"]}
+
+	local affiliationTypes = {
+		[MSBTParser.AFFILIATION_MINE] = objLocale["affiliationMine"],
+		[MSBTParser.AFFILIATION_PARTY] = objLocale["affiliationParty"],
+		[MSBTParser.AFFILIATION_RAID] = objLocale["affiliationRaid"],
+		[MSBTParser.AFFILIATION_OUTSIDER] = objLocale["affiliationOutsider"],
+		[MSBTParser.TARGET_TARGET] = objLocale["affiliationTarget"],
+		[MSBTParser.TARGET_FOCUS] = objLocale["affiliationFocus"],
+		[FLAG_YOU] = objLocale["affiliationYou"],
+	}
+
+	local reactionTypes = {
+		[MSBTParser.REACTION_FRIENDLY] = objLocale["reactionFriendly"],
+		[MSBTParser.REACTION_NEUTRAL] = objLocale["reactionNeutral"],
+		[MSBTParser.REACTION_HOSTILE] = objLocale["reactionHostile"],
+	}
+
+	local controlTypes = {
+		[MSBTParser.CONTROL_HUMAN] = objLocale["controlHuman"],
+		[MSBTParser.CONTROL_SERVER] = objLocale["controlServer"],
+	}
+
+	local unitTypes = {
+		[MSBTParser.UNITTYPE_PLAYER] = objLocale["unitTypePlayer"],
+		[MSBTParser.UNITTYPE_NPC] = objLocale["unitTypeNPC"],
+		[MSBTParser.UNITTYPE_PET] = objLocale["unitTypePet"],
+		[MSBTParser.UNITTYPE_GUARDIAN] = objLocale["unitTypeGuardian"],
+		[MSBTParser.UNITTYPE_OBJECT] = objLocale["unitTypeObject"],
+	}
+
+	local missTypes = {
+		["MISS"] = MISS,
+		["DODGE"] = DODGE,
+		["PARRY"] = PARRY,
+		["BLOCK"] = BLOCK,
+		["DEFLECT"] = DEFLECT,
+		["RESIST"] = RESIST,
+		["ABSORB"] = ABSORB,
+		["IMMUNE"] = IMMUNE,
+		["EVADE"] = EVADE,
+		["REFLECT"] = REFLECT,
+	}
+
+	local hazardTypes = {
+		["DROWNING"] = STRING_ENVIRONMENTAL_DAMAGE_DROWNING,
+		["FALLING"] = STRING_ENVIRONMENTAL_DAMAGE_FALLING,
+		["FATIGUE "] = STRING_ENVIRONMENTAL_DAMAGE_FATIGUE,
+		["FIRE"] = STRING_ENVIRONMENTAL_DAMAGE_FIRE,
+		["LAVA"] = STRING_ENVIRONMENTAL_DAMAGE_LAVA,
+		["SLIME"] = STRING_ENVIRONMENTAL_DAMAGE_SLIME,
+	}
+
+	local auraTypes = {
+		BUFF = objLocale["auraTypeBuff"],
+		DEBUFF = objLocale["auraTypeDebuff"],
+	}
+
+	local unitIDs = {
+		player = YOU,
+		target = TARGET,
+		focus = FOCUS,
+		pet = PET,
+		party = objLocale["affiliationParty"],
+		party1 = objLocale["affiliationParty"] .. " 1",
+		party2 = objLocale["affiliationParty"] .. " 2",
+		party3 = objLocale["affiliationParty"] .. " 3",
+		party4 = objLocale["affiliationParty"] .. " 4",
+		party5 = objLocale["affiliationParty"] .. " 5",
+		raid = objLocale["affiliationRaid"],
+	}
+
+	local booleanItems = {["true"] = objLocale["booleanTrue"], ["false"] = objLocale["booleanFalse"]}
+
+	local powerTypes = {}
+	for powerToken, powerType in pairs(MSBTTriggers.powerTypes) do
+		local localizedName = _G[powerToken]
+		if localizedName then powerTypes[powerType] = localizedName end
+	end
+
+	local talentSpecs = {
+		[1] = TALENT_SPEC_PRIMARY or "Primary",
+		[2] = TALENT_SPEC_SECONDARY or "Secondary",
+	}
+
+	local warriorStances
+	if not IsVanillaClassic then
+		warriorStances = {
+			[1] = GetSkillName(2457),
+			[2] = GetSkillName(71),
+			[3] = GetSkillName(2458),
+		}
+	end
+
+	local zoneTypes = {arena = objLocale["zoneTypeArena"], pvp = objLocale["zoneTypePvP"], party = objLocale["zoneTypeParty"], raid = objLocale["zoneTypeRaid"]}
+
+	frame.conditionData = {
+		sourceName = {controlType = "editbox", relations = stringRelations},
+		sourceAffiliation = {controlType = "dropdown", items = affiliationTypes, default = FLAG_YOU, relations = booleanRelations},
+		sourceReaction = {controlType = "dropdown", items = reactionTypes, default = MSBTParser.REACTION_HOSTILE, relations = booleanRelations},
+		sourceControl = {controlType = "dropdown", items = controlTypes, default = MSBTParser.CONTROL_HUMAN, relations = booleanRelations},
+		sourceUnitType = {controlType = "dropdown", items = unitTypes, default = MSBTParser.UNITTYPE_PLAYER, relations = booleanRelations},
+
+		recipientName = {controlType = "editbox", relations = stringRelations},
+		recipientAffiliation = {controlType = "dropdown", items = affiliationTypes, default = FLAG_YOU, relations = booleanRelations},
+		recipientReaction = {controlType = "dropdown", items = reactionTypes, default = MSBTParser.REACTION_HOSTILE, relations = booleanRelations},
+		recipientControl = {controlType = "dropdown", items = controlTypes, default = MSBTParser.CONTROL_HUMAN, relations = booleanRelations},
+		recipientUnitType = {controlType = "dropdown", items = unitTypes, default = MSBTParser.UNITTYPE_PLAYER, relations = booleanRelations},
+
+		skillID = {controlType = "editbox", relations = booleanRelations},
+		skillName = {controlType = "editbox", relations = stringRelations},
+		skillSchool = {controlType = "dropdown", items = MSBTMain.damageTypeMap, default = 0x1, relations = booleanRelations},
+
+		extraSkillID = {controlType = "editbox", relations = booleanRelations},
+		extraSkillName = {controlType = "editbox", relations = stringRelations},
+		extraSkillSchool = {controlType = "dropdown", items = MSBTMain.damageTypeMap, default = 0x1, relations = booleanRelations},
+
+		amount = {controlType = "editbox", relations = numberRelations},
+		overkillAmount = {controlType = "editbox", relations = numberRelations},
+		damageType = {controlType = "dropdown", items = MSBTMain.damageTypeMap, default = 0x1, relations = booleanRelations},
+		resistAmount = {controlType = "editbox", relations = numberRelations},
+		blockAmount = {controlType = "editbox", relations = numberRelations},
+		absorbAmount = {controlType = "editbox", relations = numberRelations},
+		isCrit = {controlType = "dropdown", items = booleanItems, default = "true", relations = booleanRelations},
+		isGlancing = {controlType = "dropdown", items = booleanItems, default = "true", relations = booleanRelations},
+		isCrushing = {controlType = "dropdown", items = booleanItems, default = "true", relations = booleanRelations},
+
+		missType = {controlType = "dropdown", items = missTypes, default = "MISS", relations = booleanRelations},
+		hazardType = {controlType = "dropdown", items = hazardTypes, default = "FALLING", relations = booleanRelations},
+		powerType = {controlType = "dropdown", items = powerTypes, default = 0, relations = booleanRelations},
+		extraAmount = {controlType = "editbox", relations = numberRelations},
+
+		auraType = {controlType = "dropdown", items = auraTypes, default = "BUFF", relations = booleanRelations},
+
+		threshold = {controlType = "slider", minValue=1, maxValue=100, step=1, default = 40, relations=numberRelations, defaultRelation = "lt"},
+		unitID = {controlType = "dropdown", items = unitIDs, default = "player", relations = booleanRelations},
+		unitReaction = {controlType = "dropdown", items = reactionTypes, default = MSBTParser.REACTION_HOSTILE, relations = booleanRelations},
+
+		itemID = {controlType = "editbox", relations = booleanRelations},
+		itemName = {controlType = "editbox", relations = stringRelations},
+
+		activeTalents = {controlType = "dropdown", items = talentSpecs, default = 1, relations = booleanRelations},
+		buffActive = {controlType = "editbox", relations = equalityRelations},
+		buffInactive = {controlType = "editbox", relations = equalityRelations},
+		currentCP = {controlType = "slider", minValue = 1, maxValue = 5, step = 1, default = 5, relations = numberRelations, defaultRelation = "lt"},
+		currentPower = {controlType = "slider", minValue = 1, maxValue = 100, step = 1, default = 20, relations = numberRelations, defaultRelation = "lt"},
+		inCombat = {controlType = "dropdown", items = booleanItems, default = "false", relations = booleanRelations},
+		recentlyFired = {controlType = "slider", minValue = 1, maxValue = 30, step = 1, default = 5, relations = lessThanRelations, defaultRelation = "lt"},
+		trivialTarget = {controlType = "dropdown", items = booleanItems, default = "false", relations = booleanRelations},
+		unavailableSkill = {controlType = "editbox", relations = equalityRelations},
+		zoneName = {controlType = "editbox", relations = stringRelations},
+		zoneType = {controlType = "dropdown", items = zoneTypes, default = "arena", relations = booleanRelations},
+	}
+
+	if warriorStances then
+		frame.conditionData["warriorStance"] = {controlType = "dropdown", items = warriorStances, default = 1, relations = booleanRelations}
+	end
+
+	local commonSourceFields = "sourceName sourceAffiliation sourceReaction sourceControl sourceUnitType "
+	local commonRecipientFields = "recipientName recipientAffiliation recipientReaction recipientControl recipientUnitType "
+	local commonLogFields = commonSourceFields .. commonRecipientFields
+	local commonSkillFields = "skillID skillName skillSchool "
+	local commonDamageFields = "amount overkillAmount damageType resistAmount blockAmount absorbAmount isCrit isGlancing isCrushing"
+	local commonExtraSkillFields = "extraSkillID extraSkillName extraSkillSchool "
+	local commonHealFields = "amount absorbAmount isCrit"
+	local commonPowerFields = "amount powerType"
+	local commonHealthPowerFields = "unitID unitReaction amount threshold"
+	local eventConditionData = {
+		SWING_DAMAGE = {availableConditions = commonLogFields .. commonDamageFields, defaultConditions="sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;isCrit;;eq;;true"},
+		SPELL_DAMAGE = {availableConditions = commonLogFields .. commonSkillFields .. commonDamageFields, defaultConditions="sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;isCrit;;eq;;true;;skillName;;eq;;" .. UNKNOWN},
+
+		SWING_MISSED = {availableConditions = commonLogFields .. "missType", defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;missType;;eq;;BLOCK"},
+		SPELL_MISSED = {availableConditions = commonLogFields .. commonSkillFields .. "missType", defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;missType;;eq;;RESIST;;skillName;;eq;;" .. UNKNOWN},
+		SPELL_DISPEL_FAILED = {availableConditions = commonLogFields .. commonSkillFields .. commonExtraSkillFields .. "missType", defaultConditions="sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillName;;eq;;" .. UNKNOWN},
+
+		SPELL_HEAL = {availableConditions = commonLogFields .. commonSkillFields .. commonHealFields, defaultConditions="recipientReaction;;eq;;" .. MSBTParser.REACTION_HOSTILE .. ";;isCrit;;eq;;true"},
+
+		ENVIRONMENTAL_DAMAGE = {availableConditions = commonLogFields .. commonDamageFields .. " hazardType", defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;hazardType;;eq;;DROWNING"},
+
+		SPELL_ENERGIZE = {availableConditions = commonLogFields .. commonSkillFields .. commonPowerFields, defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;powerType;;eq;;0"},
+		SPELL_DRAIN = {availableConditions = commonLogFields .. commonSkillFields .. commonPowerFields .. " extraAmount", defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;powerType;;eq;;0"},
+
+		SPELL_INTERRUPT = {availableConditions = commonLogFields .. commonSkillFields .. commonExtraSkillFields, defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU},
+
+		SPELL_AURA_APPLIED = {availableConditions = commonLogFields .. commonSkillFields .. "auraType amount", defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;skillName;;eq;;" .. UNKNOWN},
+		SPELL_AURA_BROKEN_SPELL = {availableConditions = commonLogFields .. commonSkillFields .. commonExtraSkillFields .. "auraType", defaultConditions="sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillName;;eq;;" .. UNKNOWN},
+		SPELL_AURA_REFRESH = {availableConditions = commonLogFields .. commonSkillFields .. "auraType", defaultConditions="sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillName;;eq;;" .. UNKNOWN},
+
+		ENCHANT_APPLIED = {availableConditions = commonLogFields .. "skillName itemID itemName", defaultConditions="skillName;;eq;;" .. UNKNOWN},
+
+		SPELL_DISPEL = {availableConditions = commonLogFields .. commonSkillFields .. commonExtraSkillFields .. " auraType", defaultConditions="recipientAffiliation;;eq;;" .. FLAG_YOU .. ";;skillName;;eq;;" .. UNKNOWN},
+
+		SPELL_CAST_START = {availableConditions = commonSourceFields .. commonSkillFields, defaultConditions="sourceReaction;;eq;;" .. MSBTParser.REACTION_HOSTILE .. ";;skillName;;eq;;" .. UNKNOWN},
+		SPELL_CAST_SUCCESS = {availableConditions = commonLogFields .. commonSkillFields, defaultConditions="sourceReaction;;eq;;" .. MSBTParser.REACTION_HOSTILE .. ";;skillName;;eq;;" .. UNKNOWN},
+
+		PARTY_KILL = {availableConditions = commonLogFields, defaultConditions="recipientName;;eq;;" .. UNKNOWN},
+
+		SPELL_EXTRA_ATTACKS = {availableConditions = commonLogFields .. commonSkillFields .. "amount", defaultConditions="sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillName;;eq;;" .. UNKNOWN},
+
+		UNIT_HEALTH = {availableConditions = commonHealthPowerFields, defaultConditions="unitID;;eq;;player;;threshold;;lt;;20"},
+		UNIT_POWER = {availableConditions = commonHealthPowerFields .. " powerType", defaultConditions="powerType;;eq;;0;;unitID;;eq;;player;;threshold;;lt;;20"},
+
+	}
+	eventConditionData["RANGE_DAMAGE"] = eventConditionData["SPELL_DAMAGE"]
+	eventConditionData["GENERIC_DAMAGE"] = eventConditionData["SPELL_DAMAGE"]
+	eventConditionData["SPELL_PERIODIC_DAMAGE"] = eventConditionData["SPELL_DAMAGE"]
+	eventConditionData["DAMAGE_SHIELD"] = eventConditionData["SPELL_DAMAGE"]
+	eventConditionData["DAMAGE_SPLIT"] = eventConditionData["SPELL_DAMAGE"]
+	eventConditionData["RANGE_MISSED"] = eventConditionData["SPELL_MISSED"]
+	eventConditionData["GENERIC_MISSED"] = eventConditionData["SPELL_MISSED"]
+	eventConditionData["SPELL_PERIODIC_MISSED"] = eventConditionData["SPELL_MISSED"]
+	eventConditionData["DAMAGE_SHIELD_MISSED"] = eventConditionData["SPELL_MISSED"]
+	eventConditionData["SPELL_PERIODIC_HEAL"] = eventConditionData["SPELL_HEAL"]
+	eventConditionData["SPELL_PERIODIC_ENERGIZE"] = eventConditionData["SPELL_ENERGIZE"]
+	eventConditionData["SPELL_PERIODIC_DRAIN"] = eventConditionData["SPELL_DRAIN"]
+	eventConditionData["SPELL_LEECH"] = eventConditionData["SPELL_DRAIN"]
+	eventConditionData["SPELL_PERIODIC_LEECH"] = eventConditionData["SPELL_DRAIN"]
+	eventConditionData["SPELL_AURA_REMOVED"] = eventConditionData["SPELL_AURA_APPLIED"]
+	eventConditionData["SPELL_STOLEN"] = eventConditionData["SPELL_DISPEL"]
+	eventConditionData["ENCHANT_REMOVED"] = eventConditionData["ENCHANT_APPLIED"]
+	eventConditionData["SPELL_CAST_FAILED"] = eventConditionData["SPELL_CAST_START"] -- Ignore failure reason.
+	eventConditionData["SPELL_SUMMON"] = eventConditionData["SPELL_CAST_SUCCESS"]
+	eventConditionData["SPELL_CREATE"] = eventConditionData["SPELL_CAST_START"]
+	eventConditionData["UNIT_DESTROYED"] = eventConditionData["PARTY_KILL"]
+
+	frame.eventConditionData = eventConditionData
+
+	frame.availableExceptions = "activeTalents buffActive buffInactive currentCP currentPower inCombat recentlyFired trivialTarget unavailableSkill warriorStance zoneName zoneType"
+
+	return frame
+end
+
+
+local function ShowTrigger(configTable)
+	if (not configTable or not configTable.anchorFrame or not configTable.parentFrame) then return end
+
+	if (not popupFrames.triggerFrame) then popupFrames.triggerFrame = CreateTriggerPopup() end
+
+	local frame = popupFrames.triggerFrame
+	ChangePopupParent(frame, configTable.parentFrame)
+
+	local triggerKey = configTable.triggerKey
+	local settings = MSBTProfiles.currentProfile.triggers[triggerKey]
+	frame.titleFontString:SetText(configTable.title)
+
+	EraseTable(frame.classes)
+	if (settings.classes) then
+		for className in string.gmatch(settings.classes, "[^,]+") do
+			frame.classes[className] = true
+		end
+	else
+		frame.classes["ALL"] = true
+	end
+	UpdateClassesText()
+
+	local conditions
+	EraseTable(frame.mainEvents)
+	EraseTable(frame.eventConditions)
+	if (settings.mainEvents) then
+		for eventType, eventConditions in string.gmatch(settings.mainEvents .. "&&", "(.-)%{(.-)%}&&") do
+			frame.mainEvents[#frame.mainEvents + 1] = eventType
+			conditions = {}
+			if (eventConditions ~= "") then
+				for conditionEntry in string.gmatch(eventConditions .. ";;", "(.-);;") do
+					conditions[#conditions + 1] = ConvertType(conditionEntry)
+				end
+			end
+			frame.eventConditions[#frame.eventConditions + 1] = conditions
+		end
+	end
+	UpdateMainEvents()
+
+	EraseTable(frame.exceptions)
+	if (settings.exceptions and settings.exceptions ~= "") then
+		for exceptionCondition in string.gmatch(settings.exceptions .. ";;", "(.-);;") do
+			frame.exceptions[#frame.exceptions + 1] = ConvertType(exceptionCondition)
+		end
+	end
+	UpdateExceptions()
+
+	frame.saveHandler = configTable.saveHandler
+	frame.saveArg1 = configTable.saveArg1
+	frame.hideHandler = configTable.hideHandler
+	frame:ClearAllPoints()
+	frame:SetPoint(configTable.anchorPoint or "TOPLEFT", configTable.anchorFrame, configTable.relativePoint or "BOTTOMLEFT")
+	frame:Show()
+	frame:Raise()
+end
+
+
+local function EnableSkillListControls()
+	for name, frame in pairs(popupFrames.skillListFrame.controls) do
+		if (frame.Enable) then frame:Enable() end
+	end
+end
+
+
+local function ValidateSkillListName(skillName)
+	if (not skillName or skillName == "") then
+		return L.MSG_INVALID_SKILL_NAME
+	end
+
+	if (popupFrames.skillListFrame.skills[skillName]) then
+		return L.MSG_SKILL_ALREADY_EXISTS
+	end
+end
+
+
+local function SaveSkillListName(settings)
+	local skillName = settings.inputText
+	local frame = popupFrames.skillListFrame
+	if (frame.listType == "throttle") then
+		frame.skills[skillName] = 3
+	elseif (frame.listType == "substitution") then
+		frame.skills[skillName] = settings.secondInputText
+	else
+		frame.skills[skillName] = true
+	end
+
+	frame.skillsListbox:AddItem(skillName, true)
+end
+
+
+local function DeleteSkillButtonOnClick(this)
+	local line = this:GetParent()
+	popupFrames.skillListFrame.skills[line.skillName] = false
+	popupFrames.skillListFrame.skillsListbox:RemoveItem(line.itemNumber)
+end
+
+
+local function TimeSliderOnValueChanged(this, value)
+	local line = this:GetParent()
+	popupFrames.skillListFrame.skills[line.skillName] = value
+end
+
+
+local function CreateSkillListLine(this)
+	local controls = popupFrames.skillListFrame.controls
+	local frame = CreateFrame("Button", nil, this)
+	frame:EnableMouse(false)
+
+	local button = MSBTControls.CreateIconButton(frame, "Delete")
+	local objLocale = L.BUTTONS["deleteSkill"]
+	button:SetTooltip(objLocale.tooltip)
+	button:SetPoint("RIGHT", frame, "RIGHT", -10, 0)
+	button:SetClickHandler(DeleteSkillButtonOnClick)
+	frame.deleteButton = button
+	controls[#controls + 1] = button
+
+	local slider = MSBTControls.CreateSlider(frame)
+	objLocale = L.SLIDERS["skillThrottleTime"]
+	slider:Configure(120, objLocale.label, objLocale.tooltip)
+	slider:SetPoint("RIGHT", frame.deleteButton, "LEFT", -10, -5)
+	slider:SetMinMaxValues(1, 5)
+	slider:SetValueStep(1)
+	slider:SetValueChangedHandler(TimeSliderOnValueChanged)
+	frame.timeSlider = slider
+	controls[#controls + 1] = slider
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("LEFT", frame, "LEFT", 5, 0)
+	fontString:SetPoint("RIGHT", frame.timeSlider, "LEFT", -10, 0)
+	fontString:SetJustifyH("LEFT")
+	fontString:SetTextColor(1, 1, 1)
+	frame.skillFontString = fontString
+
+	return frame
+end
+
+
+local function DisplaySkillListLine(this, line, key, isSelected)
+	local frame = popupFrames.skillListFrame
+	line.skillName = key
+	if (frame.listType == "throttle") then
+		line.skillFontString:SetText(key)
+		line.skillFontString:SetPoint("RIGHT", line.timeSlider, "LEFT", -10, 0)
+		line.timeSlider:Show()
+		line.timeSlider:SetValue(frame.skills[key] or 3)
+	elseif (frame.listType == "substitution") then
+		line.skillFontString:SetText(key .. " - " .. tostring(frame.skills[key]))
+		line.skillFontString:SetPoint("RIGHT", line.deleteButton, "LEFT", -10, 0)
+		line.timeSlider:Hide()
+	else
+		line.skillFontString:SetText(key)
+		line.skillFontString:SetPoint("RIGHT", line.deleteButton, "LEFT", -10, 0)
+		line.timeSlider:Hide()
+	end
+end
+
+
+local function CreateSkillList()
+	local frame = CreatePopup()
+	frame:SetWidth(440)
+	frame:SetHeight(360)
+	frame.controls = {}
+	local controls = frame.controls
+
+	local fontString = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	fontString:SetPoint("TOPLEFT", frame, "TOPLEFT", 44, -85)
+	fontString:SetText(L.MSG_SKILLS .. ":")
+	frame.skillsFontString = fontString
+
+	local button = MSBTControls.CreateOptionButton(frame)
+	local objLocale = L.BUTTONS["addSkill"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("LEFT", frame.skillsFontString, "RIGHT", 10, 0)
+	button:SetClickHandler(function(this)
+		local objLocale = L.EDITBOXES["skillName"]
+		EraseTable(tempConfig)
+		tempConfig.editboxLabel = objLocale.label
+		tempConfig.editboxTooltip = objLocale.tooltip
+		tempConfig.parentFrame = frame
+		tempConfig.anchorFrame = this
+		tempConfig.validateHandler = ValidateSkillListName
+		tempConfig.saveHandler = SaveSkillListName
+		tempConfig.hideHandler = EnableSkillListControls
+		if (frame.listType == "substitution") then
+			objLocale = L.EDITBOXES["substitutionText"]
+			tempConfig.showSecondEditbox = true
+			tempConfig.secondEditboxLabel = objLocale.label
+			tempConfig.secondEditboxTooltip = objLocale.tooltip
+		end
+		DisableControls(controls)
+		ShowInput(tempConfig)
+	end)
+	frame.addSkillButton = button
+	controls[#controls + 1] = button
+
+	local listbox = MSBTControls.CreateListbox(frame)
+	listbox:Configure(355, 180, 30)
+	listbox:SetPoint("TOPLEFT", frame.skillsFontString, "BOTTOMLEFT", 10, -10)
+	listbox:SetCreateLineHandler(CreateSkillListLine)
+	listbox:SetDisplayHandler(DisplaySkillListLine)
+	frame.skillsListbox = listbox
+	controls[#controls + 1] = listbox
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericSave"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMRIGHT", frame, "BOTTOM", -10, 22)
+	button:SetClickHandler(function (this)
+		frame:Hide()
+		if frame.saveHandler then
+			frame.saveHandler(frame.saveArg1)
+		end
+	end)
+	controls[#controls + 1] = button
+
+	button = MSBTControls.CreateOptionButton(frame)
+	objLocale = L.BUTTONS["genericCancel"]
+	button:Configure(24, objLocale.label, objLocale.tooltip)
+	button:SetPoint("BOTTOMLEFT", frame, "BOTTOM", 10, 22)
+	button:SetClickHandler(function(this)
+		frame:Hide()
+	end)
+	controls[#controls + 1] = button
+
+	return frame
+end
+
+
+local function ShowSkillList(configTable)
+	if (not configTable or not configTable.anchorFrame or not configTable.parentFrame or not configTable.skills) then return end
+
+	if (not popupFrames.skillListFrame) then popupFrames.skillListFrame = CreateSkillList() end
+
+	local frame = popupFrames.skillListFrame
+	ChangePopupParent(frame, configTable.parentFrame)
+
+	frame.titleFontString:SetText(configTable.title)
+
+	frame.listType = configTable.listType
+	frame.skills = configTable.skills
+	frame.skillsListbox:Clear()
+	for skillName, value in pairs(configTable.skills) do
+		if (value) then frame.skillsListbox:AddItem(skillName) end
+	end
+
+	frame.saveHandler = configTable.saveHandler
+	frame.saveArg1 = configTable.saveArg1
+	frame.hideHandler = configTable.hideHandler
+	frame:ClearAllPoints()
+	frame:SetPoint(configTable.anchorPoint or "TOPLEFT", configTable.anchorFrame, configTable.relativePoint or "BOTTOMLEFT")
+	frame:Show()
+	frame:Raise()
+end
+
+
+
 if type(FillLocalizedClassList) == "function" then
 	FillLocalizedClassList(CLASS_NAMES)
 else
@@ -1981,3 +3365,5 @@ module.ShowScrollAreaConfig			= ShowScrollAreaConfig
 module.ShowScrollAreaSelection		= ShowScrollAreaSelection
 module.ShowEvent					= ShowEvent
 module.ShowItemList					= ShowItemList
+module.ShowTrigger					= ShowTrigger
+module.ShowSkillList				= ShowSkillList

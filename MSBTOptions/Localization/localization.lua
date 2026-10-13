@@ -484,3 +484,160 @@ L.BUTTONS["playSound"]				= { label="Play", tooltip="Click to play the selected 
 L.EDITBOXES["customSoundName"]	= { label="Sound name:", tooltip="The name used to identify the sound.\n\nExample: My Sound"}
 L.EDITBOXES["customSoundPath"]	= { label="Sound path:", tooltip="The path to the sounds's file.\n\nNOTE: If the file is located in the recommended MikScrollingBattleText\\Sounds directory, only the filename needs to be entered here instead of th full path.\n\nExample: mySound.ogg "}
 L.EDITBOXES["soundFile"]		= { label="Sound filename:", tooltip="The name of the sound file to play when the event occurs."}
+
+L.TRIGGER_DATA = {}
+L.MSG_NEW_TRIGGER = "New Trigger"
+L.MSG_TRIGGER_CLASSES = "Trigger Classes"
+L.MSG_MAIN_EVENTS = "Main Events"
+L.MSG_TRIGGER_EXCEPTIONS = "Trigger Exceptions"
+L.MSG_EVENT_CONDITIONS = "Event Conditions"
+L.MSG_SKILLS = "Skills"
+L.MSG_SKILL_ALREADY_EXISTS = "Skill name already exists."
+L.MSG_INVALID_SKILL_NAME = "Invalid skill name."
+L.MSG_CONDITION = "Condition"
+L.MSG_CONDITIONS = "Conditions"
+L.CHECKBOXES["allClasses"] = { label="All Classes"}
+L.DROPDOWNS["mainEvent"] = { label="Main Event:"}
+L.DROPDOWNS["triggerCondition"] = { label="Condition:", tooltip="The condition to test."}
+L.DROPDOWNS["triggerRelation"] = { label="Relation:"}
+L.DROPDOWNS["triggerParameter"] = { label="Parameter:"}
+L.BUTTONS["addTrigger"] = { label="Add New Trigger", tooltip="Add a new trigger."}
+L.BUTTONS["triggerSettings"] = { tooltip="Click to configure the trigger conditions."}
+L.BUTTONS["deleteTrigger"] = { tooltip="Click to delete the trigger."}
+L.BUTTONS["editTriggerClasses"] = { tooltip="Click to edit the classes the trigger applies to."}
+L.BUTTONS["addMainEvent"] = { label="Add Event", tooltip="When ANY of these events occur and their defined conditions are true, the trigger will fire unless one of the specified exceptions is true."}
+L.BUTTONS["addTriggerException"] = { label="Add Exception", tooltip="When ANY of these exceptions are true, the trigger will not fire."}
+L.BUTTONS["editEventConditions"] = { tooltip="Click to edit the conditions for the event."}
+L.BUTTONS["deleteMainEvent"] = { tooltip="Click to delete the event."}
+L.BUTTONS["addEventCondition"] = { label="Add Condition", tooltip="When ALL of these conditions are true for the selected event, the trigger will fire unless one of the specified exceptions is true."}
+L.BUTTONS["editCondition"] = { tooltip="Click to edit the condition."}
+L.BUTTONS["deleteCondition"] = { tooltip="Click to delete the condition."}
+L.BUTTONS["throttleList"] = { label="Throttle List", tooltip="Set custom throttle times for specified skills."}
+L.BUTTONS["mergeExclusions"] = { label="Merge Exclusions", tooltip="Prevent specified skills from being merged."}
+L.BUTTONS["skillSuppressions"] = { label="Skill Suppressions", tooltip="Suppress skills by their name."}
+L.BUTTONS["skillSubstitutions"] = { label="Skill Substitutions", tooltip="Substitute skill names with customized values."}
+L.BUTTONS["addSkill"] = { label="Add Skill", tooltip="Add a new skill to the list."}
+L.BUTTONS["deleteSkill"] = { tooltip="Click to delete the skill."}
+L.EDITBOXES["skillName"] = { label="Skill name:", tooltip="The name of the skill to add."}
+L.EDITBOXES["substitutionText"] = { label="Substition text:", tooltip="The text to be substituted for the skill name."}
+L.SLIDERS["skillThrottleTime"] = { label="Throttle Time", tooltip="The number of seconds to throttle the skill."}
+L.TRIGGER_DATA["SWING_DAMAGE"] = "Swing Damage"
+L.TRIGGER_DATA["RANGE_DAMAGE"] = "Range Damage"
+L.TRIGGER_DATA["SPELL_DAMAGE"] = "Skill Damage"
+L.TRIGGER_DATA["GENERIC_DAMAGE"] = "Swing/Range/Skill Damage"
+L.TRIGGER_DATA["SPELL_PERIODIC_DAMAGE"] = "Periodic Skill Damage (DoT)"
+L.TRIGGER_DATA["DAMAGE_SHIELD"] = "Damage Shield Damage"
+L.TRIGGER_DATA["DAMAGE_SPLIT"] = "Split Damage"
+L.TRIGGER_DATA["ENVIRONMENTAL_DAMAGE"] = "Environmental Damage"
+L.TRIGGER_DATA["SWING_MISSED"] = "Swing Miss"
+L.TRIGGER_DATA["RANGE_MISSED"] = "Range Miss"
+L.TRIGGER_DATA["SPELL_MISSED"] = "Skill Miss"
+L.TRIGGER_DATA["GENERIC_MISSED"] = "Swing/Range/Skill Miss"
+L.TRIGGER_DATA["SPELL_PERIODIC_MISSED"] = "Periodic Skill Miss"
+L.TRIGGER_DATA["SPELL_DISPEL_FAILED"] = "Dispel Failed"
+L.TRIGGER_DATA["DAMAGE_SHIELD_MISSED"] = "Damage Shield Miss"
+L.TRIGGER_DATA["SPELL_HEAL"] = "Heal"
+L.TRIGGER_DATA["SPELL_PERIODIC_HEAL"] = "Periodic Heal (HoT)"
+L.TRIGGER_DATA["SPELL_ENERGIZE"] = "Power Gain"
+L.TRIGGER_DATA["SPELL_PERIODIC_ENERGIZE"] = "Periodic Power Gain"
+L.TRIGGER_DATA["SPELL_DRAIN"] = "Power Drain"
+L.TRIGGER_DATA["SPELL_PERIODIC_DRAIN"] = "Periodic Power Drain"
+L.TRIGGER_DATA["SPELL_LEECH"] = "Power Leech"
+L.TRIGGER_DATA["SPELL_PERIODIC_LEECH"] = "Periodic Power Leech"
+L.TRIGGER_DATA["SPELL_INTERRUPT"] = "Skill Interrupt"
+L.TRIGGER_DATA["SPELL_AURA_APPLIED"] = "Aura Application"
+L.TRIGGER_DATA["SPELL_AURA_REMOVED"] = "Aura Removal"
+L.TRIGGER_DATA["SPELL_STOLEN"] = "Aura Stolen"
+L.TRIGGER_DATA["SPELL_DISPEL"] = "Aura Dispel"
+L.TRIGGER_DATA["SPELL_AURA_REFRESH"] = "Aura Refresh"
+L.TRIGGER_DATA["SPELL_AURA_BROKEN_SPELL"] = "Aura Broken"
+L.TRIGGER_DATA["ENCHANT_APPLIED"] = "Enchant Application"
+L.TRIGGER_DATA["ENCHANT_REMOVED"] = "Enchant Removal"
+L.TRIGGER_DATA["SPELL_CAST_START"] = "Cast Start"
+L.TRIGGER_DATA["SPELL_CAST_SUCCESS"] = "Cast Success"
+L.TRIGGER_DATA["SPELL_CAST_FAILED"] = "Cast Failure"
+L.TRIGGER_DATA["SPELL_SUMMON"] = "Summon"
+L.TRIGGER_DATA["SPELL_CREATE"] = "Create"
+L.TRIGGER_DATA["PARTY_KILL"] = "Killing Blow"
+L.TRIGGER_DATA["UNIT_DESTROYED"] = "Unit Destroy"
+L.TRIGGER_DATA["SPELL_EXTRA_ATTACKS"] = "Extra Attacks"
+L.TRIGGER_DATA["UNIT_HEALTH"] = "Health Change"
+L.TRIGGER_DATA["UNIT_POWER"] = "Power Change"
+L.TRIGGER_DATA["sourceName"] = "Source Unit Name"
+L.TRIGGER_DATA["sourceAffiliation"] = "Source Unit Affiliation"
+L.TRIGGER_DATA["sourceReaction"] = "Source Unit Reaction"
+L.TRIGGER_DATA["sourceControl"] = "Source Unit Control"
+L.TRIGGER_DATA["sourceUnitType"] = "Source Unit Type"
+L.TRIGGER_DATA["recipientName"] = "Recipient Unit Name"
+L.TRIGGER_DATA["recipientAffiliation"] = "Recipient Unit Affiliation"
+L.TRIGGER_DATA["recipientReaction"] = "Recipient Unit Reaction"
+L.TRIGGER_DATA["recipientControl"] = "Recipient Unit Control"
+L.TRIGGER_DATA["recipientUnitType"] = "Recipient Unit Type"
+L.TRIGGER_DATA["skillID"] = "Skill ID"
+L.TRIGGER_DATA["skillName"] = "Skill Name"
+L.TRIGGER_DATA["skillSchool"] = "Skill School"
+L.TRIGGER_DATA["extraSkillID"] = "Extra Skill ID"
+L.TRIGGER_DATA["extraSkillName"] = "Extra Skill Name"
+L.TRIGGER_DATA["extraSkillSchool"] = "Extra Skill School"
+L.TRIGGER_DATA["amount"] = "Amount"
+L.TRIGGER_DATA["overkillAmount"] = "Overkill Amount"
+L.TRIGGER_DATA["damageType"] = "Damage Type"
+L.TRIGGER_DATA["resistAmount"] = "Resist Amount"
+L.TRIGGER_DATA["blockAmount"] = "Block Amount"
+L.TRIGGER_DATA["absorbAmount"] = "Absorb Amount"
+L.TRIGGER_DATA["isCrit"] = "Crit"
+L.TRIGGER_DATA["isGlancing"] = "Glancing Hit"
+L.TRIGGER_DATA["isCrushing"] = "Crushing Blow"
+L.TRIGGER_DATA["extraAmount"] = "Extra Amount"
+L.TRIGGER_DATA["missType"] = "Miss Type"
+L.TRIGGER_DATA["hazardType"] = "Hazard Type"
+L.TRIGGER_DATA["powerType"] = "Power Type"
+L.TRIGGER_DATA["auraType"] = "Aura Type"
+L.TRIGGER_DATA["threshold"] = "Threshold"
+L.TRIGGER_DATA["unitID"] = "Unit ID"
+L.TRIGGER_DATA["unitReaction"] = "Unit Reaction"
+L.TRIGGER_DATA["itemID"] = "Item ID"
+L.TRIGGER_DATA["itemName"] = "Item Name"
+L.TRIGGER_DATA["activeTalents"] = "Active Talents"
+L.TRIGGER_DATA["buffActive"] = "Buff Active"
+L.TRIGGER_DATA["buffInactive"] = "Buff Inactive"
+L.TRIGGER_DATA["currentCP"] = "Current Combo Points"
+L.TRIGGER_DATA["currentPower"] = "Current Power"
+L.TRIGGER_DATA["inCombat"] = "In Combat"
+L.TRIGGER_DATA["recentlyFired"] = "Trigger Recently Fired"
+L.TRIGGER_DATA["trivialTarget"] = "Trivial Target"
+L.TRIGGER_DATA["unavailableSkill"] = "Unavailable Skill"
+L.TRIGGER_DATA["warriorStance"] = "Warrior Stance"
+L.TRIGGER_DATA["zoneName"] = "Zone Name"
+L.TRIGGER_DATA["zoneType"] = "Zone Type"
+L.TRIGGER_DATA["eq"] = "Is Equal To"
+L.TRIGGER_DATA["ne"] = "Is Not Equal To"
+L.TRIGGER_DATA["like"] = "Is Like"
+L.TRIGGER_DATA["unlike"] = "Is Not Like"
+L.TRIGGER_DATA["lt"] = "Is Less Than"
+L.TRIGGER_DATA["gt"] = "Is Greater Than"
+L.TRIGGER_DATA["affiliationMine"] = "Mine"
+L.TRIGGER_DATA["affiliationParty"] = "Party Member"
+L.TRIGGER_DATA["affiliationRaid"] = "Raid Member"
+L.TRIGGER_DATA["affiliationOutsider"] = "Outsider"
+L.TRIGGER_DATA["affiliationTarget"] = TARGET
+L.TRIGGER_DATA["affiliationFocus"] = FOCUS
+L.TRIGGER_DATA["affiliationYou"] = YOU
+L.TRIGGER_DATA["reactionFriendly"] = "Friendly"
+L.TRIGGER_DATA["reactionNeutral"] = "Neutral"
+L.TRIGGER_DATA["reactionHostile"] = HOSTILE
+L.TRIGGER_DATA["controlServer"] = "Server"
+L.TRIGGER_DATA["controlHuman"] = "Human"
+L.TRIGGER_DATA["unitTypePlayer"] = PLAYER
+L.TRIGGER_DATA["unitTypeNPC"] = "NPC"
+L.TRIGGER_DATA["unitTypePet"] = PET
+L.TRIGGER_DATA["unitTypeGuardian"] = "Guardian"
+L.TRIGGER_DATA["unitTypeObject"] = "Object"
+L.TRIGGER_DATA["auraTypeBuff"] = "Buff"
+L.TRIGGER_DATA["auraTypeDebuff"] = "Debuff"
+L.TRIGGER_DATA["zoneTypeArena"] = "Arena"
+L.TRIGGER_DATA["zoneTypePvP"] = BATTLEGROUND
+L.TRIGGER_DATA["zoneTypeParty"] = "5 man instance"
+L.TRIGGER_DATA["zoneTypeRaid"] = "Raid instance"
+L.TRIGGER_DATA["booleanTrue"] = "True"
+L.TRIGGER_DATA["booleanFalse"] = "False"

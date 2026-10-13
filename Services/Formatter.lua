@@ -2,6 +2,33 @@ local Formatter = {
 	config = {},
 }
 
+local function IsSecret(value)
+	return issecretvalue ~= nil and issecretvalue(value) == true
+end
+
+local function AddSecret(secrets, value, spec)
+	local marker = "\001" .. (#secrets + 1) .. "\002"
+	secrets[#secrets + 1] = { marker = marker, value = value, spec = spec }
+	return marker
+end
+
+local function ResolveSecrets(message, secrets)
+	if #secrets == 0 then
+		return message
+	end
+	local values = {}
+	message = string.gsub(message, "%%", "%%%%")
+	message = string.gsub(message, "\001(%d+)\002", function(index)
+		local entry = secrets[tonumber(index)]
+		if not entry then
+			return ""
+		end
+		values[#values + 1] = entry.value
+		return entry.spec
+	end)
+	return string.format(message, unpack(values, 1, #values))
+end
+
 local function ColorText(settings, text)
 	return string.format(
 		"|cFF%02x%02x%02x%s|r",
@@ -71,11 +98,15 @@ local function FormatPartialAmount(self, event, profile)
 	return amount, partialAmount
 end
 
-local function FormatName(self, message, event, profile)
+local function FormatName(self, message, event, profile, secrets)
 	local name = event.name
-	if name and string.find(message, "%n", 1, true) then
+	if (IsSecret(name) or name) and string.find(message, "%n", 1, true) then
 		if event.hideNames then
 			return string.gsub(message, "%s?%-?%s?%%n", ""), true
+		end
+
+		if IsSecret(name) then
+			return string.gsub(message, "%%n", AddSecret(secrets, name, "%s")), false
 		end
 
 		if string.find(name, "-", 1, true) then
@@ -94,10 +125,20 @@ local function FormatName(self, message, event, profile)
 	return string.gsub(message, "%%n", ""), true
 end
 
-local function FormatSkill(self, message, event, profile)
+local function FormatSkill(self, message, event, profile, secrets)
 	local effectName = event.effectName
-	if not effectName then
+	if not IsSecret(effectName) and not effectName then
 		return message
+	end
+
+	if IsSecret(effectName) then
+		if event.hideSkills and string.find(message, "%s", 1, true) then
+			return string.gsub(message, "%s?%-?%s?%%sl?%s?%-?%s?", ""), true
+		end
+		local marker = AddSecret(secrets, effectName, "%s")
+		message = string.gsub(message, "%%e", marker)
+		message = string.gsub(message, "%%sl", marker)
+		return string.gsub(message, "%%s", marker), false
 	end
 
 	if string.find(message, "%e", 1, true) then
@@ -106,7 +147,7 @@ local function FormatSkill(self, message, event, profile)
 	if not string.find(message, "%s", 1, true) then
 		return message
 	end
-	if event.hideSkills then
+	if event.hideSkills or effectName == "" then
 		return string.gsub(message, "%s?%-?%s?%%sl?%s?%-?%s?", ""), true
 	end
 
@@ -130,10 +171,21 @@ function Formatter:FormatEvent(event)
 	local profile = self:GetProfile()
 	local message = event.message
 	local checkParens
+	local secrets = {}
 
-	if event.amount and string.find(message, "%a", 1, true) then
-		local amount, partialAmount = FormatPartialAmount(self, event, profile)
-		local formattedAmount = self:FormatDisplayAmount(amount, profile)
+	if IsSecret(event.damageType) then
+		event.damageType = nil
+	end
+
+	if (IsSecret(event.amount) or event.amount) and string.find(message, "%a", 1, true) then
+		local amount, partialAmount, formattedAmount
+		if IsSecret(event.amount) then
+			amount, partialAmount = event.amount, ""
+			formattedAmount = AddSecret(secrets, amount, "%.0f")
+		else
+			amount, partialAmount = FormatPartialAmount(self, event, profile)
+			formattedAmount = self:FormatDisplayAmount(amount, profile)
+		end
 		local colorEntry = event.damageType
 			and self.config.damageColorEntries[event.damageType]
 		local damageSettings = colorEntry and profile[colorEntry]
@@ -152,11 +204,11 @@ function Formatter:FormatEvent(event)
 	end
 
 	local nameChanged
-	message, nameChanged = FormatName(self, message, event, profile)
+	message, nameChanged = FormatName(self, message, event, profile, secrets)
 	checkParens = checkParens or nameChanged
 
 	local skillChanged
-	message, skillChanged = FormatSkill(self, message, event, profile)
+	message, skillChanged = FormatSkill(self, message, event, profile, secrets)
 	checkParens = checkParens or skillChanged
 
 	if checkParens then
@@ -178,7 +230,7 @@ function Formatter:FormatEvent(event)
 		message = message .. event.mergeTrailer
 	end
 
-	return message
+	return ResolveSecrets(message, secrets)
 end
 
 function Formatter:FormatLegacyEvent(

@@ -50,6 +50,8 @@ L.MSG_STATIC			= "Static"
 
 L.MSG_COMBAT					= "Combat"
 L.MSG_DISPEL					= "Dispel"
+L.MSG_CLM_FILTER				= "the combat log filter \"%s\" has no lines for your own actions, so your damage and healing are guessed. Select \"%s\" on the combat log tab for exact results."
+L.BUTTON_CLM_FILTER			= "MSBT: combat log -> \"%s\""
 L.MSG_CP						= "CP"
 L.MSG_CHI_FULL					= "Full Chi"
 L.MSG_AC						= "Arcane Charge"

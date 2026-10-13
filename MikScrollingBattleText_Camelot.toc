@@ -14,6 +14,7 @@ Libs\CallbackHandler-1.0.lua
 Libs\LibSharedMedia-3.0.lua
 
 MikSBT.lua
+Services\Trace.lua
 Compatibility\Client.lua
 Configuration\ProfileStore.lua
 Configuration\MediaRegistry.lua
@@ -27,10 +28,14 @@ API\Cooldowns.lua
 Compatibility\LegacyAPI.lua
 Services\Formatter.lua
 Services\EventRouter.lua
+Services\CombatRoutes.lua
 Components\IncomingCombat.lua
 Components\OutgoingBatcher.lua
 Components\DamageMeterSource.lua
 Components\OutgoingCombat.lua
+Components\CombatTextSource.lua
+Components\CombatLogMessageSource.lua
+Components\CombatLogFilterButton.lua
 Components\ParserNotifications.lua
 Components\UtilityNotifications.lua
 Components\ItemCooldownTracker.lua

@@ -404,3 +404,157 @@ L.BUTTONS["playSound"]				= { label="Воспр.", tooltip="Нажмите дл�
 L.EDITBOXES["customSoundName"]	= { label="Звук:", tooltip="Название, используемое для определения звука.\n\nПример: Мой Звук"}
 L.EDITBOXES["customSoundPath"]	= { label="Путь к звуку:", tooltip="Путь к файлу звука.\n\nNOTE: Если файл находится в рекомендованном директории звуков\\MikScrollingBattleText, тогда впишите только названия файла, вместо полного пути.\n\nExample: мойЗвук.ogg "}
 L.EDITBOXES["soundFile"]		= { label="Звуковой файл:", tooltip="Название звукового файла который будет проигрываться при свершении события."}
+
+L.MSG_NEW_TRIGGER = "Новый триггер"
+L.MSG_TRIGGER_CLASSES = "Триггер классы"
+L.MSG_MAIN_EVENTS = "Главные события"
+L.MSG_TRIGGER_EXCEPTIONS = "Триггер исключения"
+L.MSG_EVENT_CONDITIONS = "Условие события"
+L.MSG_SKILLS = "Навыки"
+L.MSG_SKILL_ALREADY_EXISTS = "Название навыка уже существует."
+L.MSG_INVALID_SKILL_NAME = "Неверное название навыка."
+L.MSG_CONDITION = "Условие"
+L.MSG_CONDITIONS = "Условия"
+L.CHECKBOXES["allClasses"] = { label="Все классы"}
+L.DROPDOWNS["mainEvent"] = { label="Главные события:"}
+L.DROPDOWNS["triggerCondition"] = { label="Условие:", tooltip="Условие для теста."}
+L.DROPDOWNS["triggerRelation"] = { label="Отношение:"}
+L.DROPDOWNS["triggerParameter"] = { label="Параметр:"}
+L.BUTTONS["addTrigger"] = { label="Добавить триггер", tooltip="Добавить новый триггер."}
+L.BUTTONS["triggerSettings"] = { tooltip="Кликните для настройки условий триггера."}
+L.BUTTONS["deleteTrigger"] = { tooltip="Кликните для удаления триггера."}
+L.BUTTONS["editTriggerClasses"] = { tooltip="Кликните для редактирования классов к которым будет задействован данный триггер."}
+L.BUTTONS["addMainEvent"] = { label="Добавить событие", tooltip="Когда случаются КАКИЕ-НИБУДЬ события и их условия действительны, триггер просигналит.\n\nЗа исключением если одно из установленных исключений не будет действительно."}
+L.BUTTONS["addTriggerException"] = { label="Добавить исключение", tooltip="Когда КАКОЕ-НИБУДЬ исключение будет действительно, триггер не просигналит."}
+L.BUTTONS["editEventConditions"] = { tooltip="Кликните для редактирования условий события."}
+L.BUTTONS["deleteMainEvent"] = { tooltip="Кликните для удаления события."}
+L.BUTTONS["addEventCondition"] = { label="Добавить условие", tooltip="Когда КАКОЕ-НИБУДЬ условие будет действительно для выбранного события, триггер просигналит если не будет не одного действительного исключения."}
+L.BUTTONS["editCondition"] = { tooltip="Кликните для редактирования условия."}
+L.BUTTONS["deleteCondition"] = { tooltip="Кликните для удаления условия."}
+L.BUTTONS["throttleList"] = { label="Список регулировок", tooltip="Установка индивидуального времени для определённых навыков."}
+L.BUTTONS["mergeExclusions"] = { label="Слияние исключение", tooltip="Предотвращать слияние определённых навыков."}
+L.BUTTONS["skillSuppressions"] = { label="Блокир-ка навыков", tooltip="Скрывать навыки по их названиям."}
+L.BUTTONS["skillSubstitutions"] = { label="Замена навыков", tooltip="Заменить название навыка на пользовательское значение."}
+L.BUTTONS["addSkill"] = { label="Добавить навык", tooltip="Добавить новый навык в список."}
+L.BUTTONS["deleteSkill"] = { tooltip="Кликните для удаления навыка."}
+L.EDITBOXES["skillName"] = { label="Название навыка:", tooltip="Название навыка который будет добавлен."}
+L.EDITBOXES["substitutionText"] = { label="Текст замещения:", tooltip="Текст который будет заменять название навыка."}
+L.SLIDERS["skillThrottleTime"] = { label="Регулятор время", tooltip="Число секунд, чтобы замедлить отображение навыков."}
+L.TRIGGER_DATA["SWING_DAMAGE"] = "Обычный Урон"
+L.TRIGGER_DATA["RANGE_DAMAGE"] = "Дальний урон"
+L.TRIGGER_DATA["SPELL_DAMAGE"] = "Урон навыков"
+L.TRIGGER_DATA["GENERIC_DAMAGE"] = "Рывок/Навык/Дальний урон"
+L.TRIGGER_DATA["SPELL_PERIODIC_DAMAGE"] = "Периодический урон навыка (УзВ)"
+L.TRIGGER_DATA["DAMAGE_SHIELD"] = "Урон от Ранящего щита"
+L.TRIGGER_DATA["DAMAGE_SPLIT"] = "Прерывистый урон"
+L.TRIGGER_DATA["ENVIRONMENTAL_DAMAGE"] = "Урон окружающей среды"
+L.TRIGGER_DATA["SWING_MISSED"] = "Промах рывка"
+L.TRIGGER_DATA["RANGE_MISSED"] = "Дальний промах"
+L.TRIGGER_DATA["SPELL_MISSED"] = "Промах навыка"
+L.TRIGGER_DATA["GENERIC_MISSED"] = "Рывок/Навык/Дальний промах"
+L.TRIGGER_DATA["SPELL_PERIODIC_MISSED"] = "Промах Периодического навыка"
+L.TRIGGER_DATA["SPELL_DISPEL_FAILED"] = "Неудачное Рассеивание"
+L.TRIGGER_DATA["DAMAGE_SHIELD_MISSED"] = "Промах Ранящего щита"
+L.TRIGGER_DATA["SPELL_HEAL"] = "Исцеление"
+L.TRIGGER_DATA["SPELL_PERIODIC_HEAL"] = "Периодическое исцеление (ИзВ)"
+L.TRIGGER_DATA["SPELL_ENERGIZE"] = "Прирост энергии"
+L.TRIGGER_DATA["SPELL_PERIODIC_ENERGIZE"] = "Периодический прирост энергии"
+L.TRIGGER_DATA["SPELL_DRAIN"] = "Похищение энергии"
+L.TRIGGER_DATA["SPELL_PERIODIC_DRAIN"] = "Периодическое похищение энергии"
+L.TRIGGER_DATA["SPELL_LEECH"] = "Выпивание энергии"
+L.TRIGGER_DATA["SPELL_PERIODIC_LEECH"] = "Периодическое выпивание энергии"
+L.TRIGGER_DATA["SPELL_INTERRUPT"] = "Прерывание Навыка"
+L.TRIGGER_DATA["SPELL_AURA_APPLIED"] = "Использование Ауры"
+L.TRIGGER_DATA["SPELL_AURA_REMOVED"] = "Снятие Аура"
+L.TRIGGER_DATA["SPELL_STOLEN"] = "Хищение Ауры"
+L.TRIGGER_DATA["SPELL_DISPEL"] = "Рассеивание Ауры"
+L.TRIGGER_DATA["SPELL_AURA_REFRESH"] = "Обновление ауры"
+L.TRIGGER_DATA["SPELL_AURA_BROKEN_SPELL"] = "Прекращение ауры"
+L.TRIGGER_DATA["ENCHANT_APPLIED"] = "Использование Очарования"
+L.TRIGGER_DATA["ENCHANT_REMOVED"] = "Снятие очарования"
+L.TRIGGER_DATA["SPELL_CAST_START"] = "Начало Чтения"
+L.TRIGGER_DATA["SPELL_CAST_SUCCESS"] = "Успешное Чтение"
+L.TRIGGER_DATA["SPELL_CAST_FAILED"] = "Неудачное Чтение"
+L.TRIGGER_DATA["SPELL_SUMMON"] = "Призывание"
+L.TRIGGER_DATA["SPELL_CREATE"] = "Создавание"
+L.TRIGGER_DATA["PARTY_KILL"] = "Победный Удар"
+L.TRIGGER_DATA["UNIT_DESTROYED"] = "Ликвидация объекта"
+L.TRIGGER_DATA["SPELL_EXTRA_ATTACKS"] = "Экстра атаки"
+L.TRIGGER_DATA["UNIT_HEALTH"] = "Изменение здоровья"
+L.TRIGGER_DATA["UNIT_POWER"] = "Изменение энергии"
+L.TRIGGER_DATA["sourceName"] = "Название источника"
+L.TRIGGER_DATA["sourceAffiliation"] = "Источник принадлежности объекта"
+L.TRIGGER_DATA["sourceReaction"] = "Источник реакции объекта"
+L.TRIGGER_DATA["sourceControl"] = "Источник контроля объекта"
+L.TRIGGER_DATA["sourceUnitType"] = "Тип источника"
+L.TRIGGER_DATA["recipientName"] = "Название получателя"
+L.TRIGGER_DATA["recipientAffiliation"] = "Получатель принадлежности объекта"
+L.TRIGGER_DATA["recipientReaction"] = "Получатель реакции объекта"
+L.TRIGGER_DATA["recipientControl"] = "Получатель контроля объекта"
+L.TRIGGER_DATA["recipientUnitType"] = "Тип получателя"
+L.TRIGGER_DATA["skillID"] = "ID навыка"
+L.TRIGGER_DATA["skillName"] = "Название навыка"
+L.TRIGGER_DATA["skillSchool"] = "Школа навыка"
+L.TRIGGER_DATA["extraSkillID"] = "Экстра ID навыка"
+L.TRIGGER_DATA["extraSkillName"] = "Экстра название навыка"
+L.TRIGGER_DATA["extraSkillSchool"] = "Экстра школа навыка"
+L.TRIGGER_DATA["amount"] = "Значение"
+L.TRIGGER_DATA["overkillAmount"] = "Значение многократного уничтожения"
+L.TRIGGER_DATA["damageType"] = "Тип урона"
+L.TRIGGER_DATA["resistAmount"] = "Значение сопрот."
+L.TRIGGER_DATA["blockAmount"] = "Значение блока"
+L.TRIGGER_DATA["absorbAmount"] = "Значение поглот."
+L.TRIGGER_DATA["isCrit"] = "Крит"
+L.TRIGGER_DATA["isGlancing"] = "Косые удары"
+L.TRIGGER_DATA["isCrushing"] = "Сокрушительный удар"
+L.TRIGGER_DATA["extraAmount"] = "Экстра значение"
+L.TRIGGER_DATA["missType"] = "Тип промаха"
+L.TRIGGER_DATA["hazardType"] = "Тип опасности"
+L.TRIGGER_DATA["powerType"] = "Тип энергии"
+L.TRIGGER_DATA["auraType"] = "Тип ауры"
+L.TRIGGER_DATA["threshold"] = "Порог"
+L.TRIGGER_DATA["unitID"] = "ID объекта"
+L.TRIGGER_DATA["unitReaction"] = "Реакция объекта"
+L.TRIGGER_DATA["activeTalents"] = "Активный талант"
+L.TRIGGER_DATA["buffActive"] = "Активность заклинания"
+L.TRIGGER_DATA["buffInactive"] = "Бездействующий бафф"
+L.TRIGGER_DATA["currentCP"] = "Текущие очки энергии"
+L.TRIGGER_DATA["currentPower"] = "Текущая сила"
+L.TRIGGER_DATA["inCombat"] = "В бою"
+L.TRIGGER_DATA["recentlyFired"] = "Недавно просигналивший триггер"
+L.TRIGGER_DATA["trivialTarget"] = "Обычная цель"
+L.TRIGGER_DATA["unavailableSkill"] = "Недоступный навык"
+L.TRIGGER_DATA["warriorStance"] = "Стоики война"
+L.TRIGGER_DATA["zoneName"] = "Название зоны"
+L.TRIGGER_DATA["zoneType"] = "Тип зоны"
+L.TRIGGER_DATA["eq"] = "Равен"
+L.TRIGGER_DATA["ne"] = "Не равен"
+L.TRIGGER_DATA["like"] = "Похожий"
+L.TRIGGER_DATA["unlike"] = "Не похожий"
+L.TRIGGER_DATA["lt"] = "Меньше чем"
+L.TRIGGER_DATA["gt"] = "Больше чем"
+L.TRIGGER_DATA["affiliationMine"] = "Моё"
+L.TRIGGER_DATA["affiliationParty"] = "Участник группы"
+L.TRIGGER_DATA["affiliationRaid"] = "Участник рейда"
+L.TRIGGER_DATA["affiliationOutsider"] = "Аутсайдер"
+L.TRIGGER_DATA["affiliationTarget"] = TARGET
+L.TRIGGER_DATA["affiliationFocus"] = "Фокус"
+L.TRIGGER_DATA["affiliationYou"] = YOU
+L.TRIGGER_DATA["reactionFriendly"] = "Дружелюбный"
+L.TRIGGER_DATA["reactionNeutral"] = "Нейтральный"
+L.TRIGGER_DATA["reactionHostile"] = HOSTILE
+L.TRIGGER_DATA["controlServer"] = "Сервер"
+L.TRIGGER_DATA["controlHuman"] = "Человек"
+L.TRIGGER_DATA["unitTypePlayer"] = PLAYER
+L.TRIGGER_DATA["unitTypeNPC"] = "НИП"
+L.TRIGGER_DATA["unitTypePet"] = PET
+L.TRIGGER_DATA["unitTypeGuardian"] = "Страж"
+L.TRIGGER_DATA["unitTypeObject"] = "Объект"
+L.TRIGGER_DATA["auraTypeBuff"] = "Полож. эффект"
+L.TRIGGER_DATA["auraTypeDebuff"] = "Отриц. эффект"
+L.TRIGGER_DATA["zoneTypeArena"] = "Арена"
+L.TRIGGER_DATA["zoneTypePvP"] = BATTLEGROUND
+L.TRIGGER_DATA["zoneTypeParty"] = "Подземелье на 5-чел"
+L.TRIGGER_DATA["zoneTypeRaid"] = "Рейдовое подземелье"
+L.TRIGGER_DATA["booleanTrue"] = "Верный"
+L.TRIGGER_DATA["booleanFalse"] = "Неверный"
