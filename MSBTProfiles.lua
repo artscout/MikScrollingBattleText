@@ -1,174 +1,105 @@
--------------------------------------------------------------------------------
--- Title: Mik's Scrolling Battle Text Profiles
--- Author: Mikord
--------------------------------------------------------------------------------
 
--- Create module and set its name.
 local module = {}
 local moduleName = "Profiles"
 MikSBT[moduleName] = module
 
-
--------------------------------------------------------------------------------
--- Imports.
--------------------------------------------------------------------------------
-
--- Local references to various modules for faster access.
 local L = MikSBT.translations
 
--- Local references to various functions for faster access.
 local string_find = string.find
 local string_gsub = string.gsub
 local string_format = string.format
+
 local CopyTable = MikSBT.CopyTable
 local EraseTable = MikSBT.EraseTable
-local SplitString = MikSBT.SplitString
-local Print = MikSBT.Print
 local GetSkillName = MikSBT.GetSkillName
+local Print = MikSBT.Print
+local SplitString = MikSBT.SplitString
+local Client = MikSBT.Compatibility.Client
 
-local IsClassic = WOW_PROJECT_ID >= WOW_PROJECT_CLASSIC
-
-
--------------------------------------------------------------------------------
--- Private constants.
--------------------------------------------------------------------------------
+local IsClassic = Client.isClassicContent
+local IsCataClassic = Client.isCataClassic
 
 local DEFAULT_PROFILE_NAME = "Default"
 
--- The .toc entries for saved variables.
-local SAVED_VARS_NAME			= "MSBTProfiles_SavedVars"
-local SAVED_VARS_PER_CHAR_NAME	= "MSBTProfiles_SavedVarsPerChar"
-local SAVED_MEDIA_NAME			= "MSBT_SavedMedia"
-
--- Localized pet name followed by a space.
 local PET_SPACE = PET .. " "
 
--- Flags used by the combat log.
-local FLAG_YOU 					= 0xF0000000
+local FLAG_YOU					= 0xF0000000
 local TARGET_TARGET				= 0x00010000
 local REACTION_HOSTILE			= 0x00000040
 
-
--- Spell IDs.
---local SPELLID_BERSERK			= 93622
---local SPELLID_ELUSIVE_BREW		= 126453 -- Activated ability
+local SPELLID_ELUSIVE_BREW		= 126453
 local SPELLID_EXECUTE			= 5308
 local SPELLID_FIRST_AID			= 3273
-local SPELLID_HAMMER_OF_WRATH		= 24275
-local SPELLID_KILL_SHOT			= 53351
---local SPELLID_LAVA_SURGE		= not IsClassic and 77762
-local SPELLID_REVENGE			= 6572
-local SPELLID_VICTORY_RUSH		= 34428
---local SPELLID_SHADOW_ORB		= 77487
+local SPELLID_HAMMER_OF_WRATH	= 24275
 
--- Trigger spell names.
---local SPELL_BERSERK				= GetSkillName(SPELLID_BERSERK)
---local SPELL_BLINDSIDE				= GetSkillName(121153)
---local SPELL_BLOODSURGE			= GetSkillName(46916)
-local SPELL_BRAIN_FREEZE			= GetSkillName(44549)
-local SPELL_BF_FIREBALL				= GetSkillName(57761)
+local SPELLID_LAVA_SURGE		= not IsClassic and 77762
+local SPELLID_REVENGE			= 6572
+local SPELLID_VICTORY_RUSH		= not IsClassic and 34428
+
 local SPELL_CLEARCASTING			= GetSkillName(16870)
---local SPELL_DECIMATION			= GetSkillName(108869)
---local SPELL_ELUSIVE_BREW			= not IsClassic and GetSkillName(128939)
-local SPELL_EXECUTE				= GetSkillName(SPELLID_EXECUTE)
-local SPELL_FINGERS_OF_FROST			= GetSkillName(44544)
-local SPELL_FREEZING_FOG			= GetSkillName(59052)
+
+local SPELL_ELUSIVE_BREW			= not IsClassic and GetSkillName(128939)
+local SPELL_EXECUTE					= GetSkillName(SPELLID_EXECUTE)
+local SPELL_FINGERS_OF_FROST		= not IsClassic and GetSkillName(112965)
+local SPELL_FREEZING_FOG			= not IsClassic and GetSkillName(59052)
 local SPELL_HAMMER_OF_WRATH			= GetSkillName(SPELLID_HAMMER_OF_WRATH)
-local SPELL_KILL_SHOT				= GetSkillName(SPELLID_KILL_SHOT)
-local SPELL_KILLING_MACHINE			= GetSkillName(51124)
---local SPELL_LAVA_SURGE			= not IsClassic and GetSkillName(SPELLID_LAVA_SURGE)
---local SPELL_LOCK_AND_LOAD			= GetSkillName(168980)
-local SPELL_MAELSTROM_WEAPON			= GetSkillName(53817)
---local SPELL_MANA_TEA				= GetSkillName(115867)
-local SPELL_MISSILE_BARRAGE			= GetSkillName(62401)
---local SPELL_MOLTEN_CORE			= GetSkillName(122351)
---local SPELL_NIGHTFALL				= GetSkillName(108558)
-local SPELL_PREDATORS_SWIFTNESS			= GetSkillName(69369)
-local SPELL_PVP_TRINKET				= GetSkillName(42292)
-local SPELL_REVENGE				= GetSkillName(SPELLID_REVENGE)
-local SPELL_RIME 				= GetSkillName(59057)
+
+local SPELL_KILLING_MACHINE			= not IsClassic and GetSkillName(51124)
+local SPELL_LAVA_SURGE				= not IsClassic and GetSkillName(SPELLID_LAVA_SURGE)
+
+local SPELL_MISSILE_BARRAGE			= not IsClassic and GetSkillName(62401)
+
+local SPELL_PREDATORS_SWIFTNESS		= not IsClassic and GetSkillName(69369)
+local SPELL_PVP_TRINKET				= not IsClassic and GetSkillName(42292)
+local SPELL_REVENGE					= GetSkillName(SPELLID_REVENGE)
+local SPELL_RIME 					= not IsClassic and GetSkillName(59057)
 local SPELL_SHADOW_TRANCE			= GetSkillName(17941)
 local SPELL_SHIELD_SLAM				= GetSkillName(23922)
---local SPELL_SHADOW_INFUSION		= GetSkillName(91342)
---local SPELL_SHADOW_ORB			= GetSkillName(SPELLID_SHADOW_ORB)
---local SPELL_SHOOTING_STARS		= GetSkillName(93400)
-local SPELL_SUDDEN_DEATH			= GetSkillName(52437)
---local SPELL_SUDDEN_DOOM				= not IsClassic and GetSkillName(81340)	-- XXX: No trigger atm - DK
-local SPELL_SWORD_AND_BOARD			= GetSkillName(50227)
-local SPELL_TASTE_FOR_BLOOD			= GetSkillName(56636)
-local SPELL_THE_ART_OF_WAR			= GetSkillName(59578)
-local SPELL_TIDAL_WAVES				= GetSkillName(53390)
---local SPELL_ULTIMATUM				= GetSkillName(122510)
-local SPELL_VICTORY_RUSH			= GetSkillName(SPELLID_VICTORY_RUSH)  -- XXX: Update for buff
---local SPELL_VITAL_MISTS			= GetSkillName(122107)
 
--- Throttle, suppression, and other spell names.
---local SPELL_BLOOD_PRESENCE		= GetSkillName(48266)
---local SPELL_DRAIN_LIFE				= not IsClassic and GetSkillName(234153)
-local SPELL_SHADOWMEND				= GetSkillName(39373)
---local SPELL_REFLECTIVE_SHIELD		= GetSkillName(58252)
-local SPELL_UNDYING_RESOLVE			= GetSkillName(51915)
-local SPELL_VAMPIRIC_EMBRACE			= GetSkillName(15286)
-local SPELL_VAMPIRIC_TOUCH			= GetSkillName(34914)
+local SPELL_SUDDEN_DEATH			= not IsClassic and GetSkillName(52437)
+local SPELL_SUDDEN_DOOM				= not IsClassic and GetSkillName(81340)
 
+local SPELL_TIDAL_WAVES				= not IsClassic and GetSkillName(53390)
 
+local SPELL_VICTORY_RUSH			= not IsClassic and GetSkillName(SPELLID_VICTORY_RUSH)
 
--------------------------------------------------------------------------------
--- Private variables.
--------------------------------------------------------------------------------
+local SPELL_DRAIN_LIFE				= not IsClassic and GetSkillName(234153)
+local SPELL_SHADOWMEND				= not IsClassic and GetSkillName(39373)
 
---- Prevent tainting global _.
+local SPELL_UNDYING_RESOLVE			= not IsClassic and GetSkillName(51915)
+local SPELL_VAMPIRIC_EMBRACE		= GetSkillName(15286)
+local SPELL_VAMPIRIC_TOUCH			= not IsClassic and GetSkillName(34914)
+
 local _
 
--- Dynamically created frame for receiving events.
 local eventFrame
 
--- Meta table for the differential profile tables.
 local differentialMap = {}
-local differential_mt = { __index = function(t,k) return differentialMap[t][k] end }
+local differential_mt = { __index = function(t, k) return differentialMap[t][k] end }
 local differentialCache = {}
 
--- Holds variables to be saved between sessions.
 local savedVariables
 local savedVariablesPerChar
 local savedMedia
 
--- Currently selected profile.
 local currentProfile
+local runtimeController
 
--- Path information for setting differential options.
 local pathTable = {}
 
--- Flag to hold whether or not this is the first load.
 local isFirstLoad
 
-
--------------------------------------------------------------------------------
--- Master profile utility functions.
--------------------------------------------------------------------------------
-
--- ****************************************************************************
--- Returns a table to be used for the settings of the passed class using color
--- information from the default class colors table.
--- ****************************************************************************
 local function CreateClassSettingsTable(class)
-	-- Return disabled settings if the class doesn't exist in the default class colors table for some reason.
+
 	if (not RAID_CLASS_COLORS[class]) then return { disabled = true, colorR = 1, colorG = 1, colorB = 1 } end
 
-	-- Return a table using the default class color.
 	return { colorR = RAID_CLASS_COLORS[class].r, colorG = RAID_CLASS_COLORS[class].g, colorB = RAID_CLASS_COLORS[class].b }
 end
-
-
-
--------------------------------------------------------------------------------
--- Master profile.
--------------------------------------------------------------------------------
 
 local masterProfile
 if IsClassic then
 	masterProfile = {
-		-- Scroll area settings.
+
 		scrollAreas = {
 			Incoming = {
 				name					= L.MSG_INCOMING,
@@ -210,8 +141,6 @@ if IsClassic then
 			},
 		},
 
-
-		-- Built-in event settings.
 		events = {
 			INCOMING_DAMAGE = {
 				colorG		= 0,
@@ -425,7 +354,6 @@ if IsClassic then
 				scrollArea	= "Incoming",
 			},
 
-
 			OUTGOING_DAMAGE = {
 				message		= "%a",
 				scrollArea	= "Outgoing",
@@ -592,7 +520,6 @@ if IsClassic then
 				scrollArea	= "Outgoing",
 			},
 
-
 			PET_INCOMING_DAMAGE = {
 				colorG		= 0.41,
 				colorB		= 0.41,
@@ -758,7 +685,6 @@ if IsClassic then
 				scrollArea	= "Incoming",
 				isCrit		= true,
 			},
-
 
 			PET_OUTGOING_DAMAGE = {
 				colorG		= 0.5,
@@ -949,7 +875,6 @@ if IsClassic then
 				scrollArea	= "Outgoing",
 			},
 
-
 			NOTIFICATION_DEBUFF = {
 				colorR		= 0,
 				colorG		= 0.5,
@@ -1077,6 +1002,18 @@ if IsClassic then
 				alwaysSticky	= true,
 				fontSize		= 26,
 			},
+			NOTIFICATION_ESSENCE_CHANGE = {
+				colorG		= 0.5,
+				colorB		= 0,
+				message		= "%a " .. L.MSG_ESSENCE,
+			},
+			NOTIFICATION_ESSENCE_FULL = {
+				colorG			= 0.5,
+				colorB			= 0,
+				message			= L.MSG_ESSENCE_FULL .. "!",
+				alwaysSticky	= true,
+				fontSize		= 26,
+			},
 			NOTIFICATION_HONOR_GAIN = {
 				colorR		= 0.5,
 				colorG		= 0.5,
@@ -1145,37 +1082,12 @@ if IsClassic then
 				message		= "+%e",
 				scrollArea	= "Static",
 			},
-			NOTIFICATION_COOLDOWN = {
-				message		= "%e " .. L.MSG_READY_NOW .. "!",
-				scrollArea	= "Static",
-				fontSize	= 22,
-				soundFile	= "MSBT Cooldown",
-				skillColorR	= 1,
-				skillColorG	= 0,
-				skillColorB	= 0,
-			},
-			NOTIFICATION_PET_COOLDOWN = {
-				colorR		= 0.57,
-				colorG		= 0.58,
-				message		= PET .. " %e " .. L.MSG_READY_NOW .. "!",
-				scrollArea	= "Static",
-				fontSize	= 22,
-				soundFile	= "MSBT Cooldown",
-				skillColorR	= 1,
-				skillColorG	= 0.41,
-				skillColorB	= 0.41,
-			},
 			NOTIFICATION_ITEM_COOLDOWN = {
-				colorR		= 0.784,
-				colorG		= 0.784,
-				colorB		= 0,
-				message		= " %e " .. L.MSG_READY_NOW .. "!",
-				scrollArea	= "Static",
-				fontSize	= 22,
-				soundFile	= "MSBT Cooldown",
-				skillColorR	= 1,
-				skillColorG	= 0.588,
-				skillColorB	= 0.588,
+				colorR = 0.784, colorG = 0.784, colorB = 0,
+				message = " %e " .. L.MSG_READY_NOW .. "!",
+				scrollArea = "Static", fontSize = 22,
+				soundFile = "MSBT Cooldown",
+				skillColorR = 1, skillColorG = 0.588, skillColorB = 0.588,
 			},
 			NOTIFICATION_LOOT = {
 				colorB		= 0,
@@ -1187,49 +1099,10 @@ if IsClassic then
 				message		= "+%a %e (%t)",
 				scrollArea	= "Static",
 			},
-		}, -- End events
+		},
 
-
-		-- Default trigger settings.
 		triggers = {
-			--[[MSBT_TRIGGER_BERSERK = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_BERSERK,
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DRUID",
-				mainEvents		= "SPELL_AURA_APPLIED{skillID;;eq;;" .. SPELLID_BERSERK .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_BLINDSIDE = {
-				colorR			= 0.709,
-				colorG			= 0,
-				colorB			= 0.709,
-				message			= SPELL_BLINDSIDE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "ROGUE",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BLINDSIDE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-			--[[MSBT_TRIGGER_BLOODSURGE = {
-				colorR			= 0.8,
-				colorG			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_BLOODSURGE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BLOODSURGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-			MSBT_TRIGGER_BRAIN_FREEZE = {
-				colorG			= 0.627,
-				colorB			= 0.627,
-				message			= SPELL_BRAIN_FREEZE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MAGE",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BF_FIREBALL .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
+
 			MSBT_TRIGGER_CLEARCASTING = {
 				colorB			= 0,
 				message			= SPELL_CLEARCASTING .. "!",
@@ -1238,25 +1111,7 @@ if IsClassic then
 				classes			= "DRUID,MAGE,PRIEST,SHAMAN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_CLEARCASTING .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_DECIMATION = {
-				colorG			= 0.627,
-				colorB			= 0.627,
-				message			= SPELL_DECIMATION .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARLOCK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_DECIMATION .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_ELUSIVE_BREW = {
-				colorB			= 0,
-				message			= SPELL_ELUSIVE_BREW .. " x%a!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MONK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}&&" ..
-								"SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;10;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}&&" ..
-								"SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;15;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+
 			MSBT_TRIGGER_EXECUTE = {
 				colorB			= 0,
 				message			= SPELL_EXECUTE .. "!",
@@ -1267,16 +1122,7 @@ if IsClassic then
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_EXECUTE,
 				iconSkill		= SPELLID_EXECUTE,
 			},
-			MSBT_TRIGGER_FINGERS_OF_FROST = {
-				colorR			= 0.118,
-				colorG			= 0.882,
-				message			= SPELL_FINGERS_OF_FROST .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MAGE",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_FINGERS_OF_FROST .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-				exceptions		= "recentlyFired;;lt;;2",
-			},
+
 			MSBT_TRIGGER_HAMMER_OF_WRATH = {
 				colorB			= 0,
 				message			= SPELL_HAMMER_OF_WRATH .. "!",
@@ -1287,63 +1133,25 @@ if IsClassic then
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_HAMMER_OF_WRATH,
 				iconSkill		= SPELLID_HAMMER_OF_WRATH,
 			},
-			MSBT_TRIGGER_KILL_SHOT = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_KILL_SHOT .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "HUNTER",
-				mainEvents		= "UNIT_HEALTH{unitID;;eq;;target;;threshold;;lt;;20;;unitReaction;;eq;;" .. REACTION_HOSTILE .. "}",
-				exceptions		= "unavailableSkill;;eq;;" .. SPELL_KILL_SHOT,
-				iconSkill		= SPELLID_KILL_SHOT,
-			},
-			MSBT_TRIGGER_KILLING_MACHINE = {
-				colorR			= 0.118,
-				colorG			= 0.882,
-				message			= SPELL_KILLING_MACHINE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DEATHKNIGHT",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_KILLING_MACHINE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			--[[MSBT_TRIGGER_LAVA_SURGE = {
-				colorG			= 0.341,
-				colorB			= 0.129,
-				message			= SPELL_LAVA_SURGE,
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "SHAMAN",
-				mainEvents		= "SPELL_CAST_SUCCESS{sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillID;;eq;;" .. SPELLID_LAVA_SURGE .. "}",
-			},]]
-			--[[MSBT_TRIGGER_LOCK_AND_LOAD = {
-				colorR			= 0.627,
-				colorG			= 0.5,
-				colorB			= 0,
-				message			= SPELL_LOCK_AND_LOAD .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "HUNTER",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_LOCK_AND_LOAD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+
 			MSBT_TRIGGER_LOW_HEALTH = {
+				disabled		= true,
 				colorG			= 0.5,
 				colorB			= 0.5,
 				message			= L.MSG_TRIGGER_LOW_HEALTH .. "! (%a)",
 				alwaysSticky	= true,
 				fontSize		= 26,
-				soundFile		= "MSBT Low Health",
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;player;;threshold;;lt;;35}",
 				exceptions		= "recentlyFired;;lt;;5",
 				iconSkill		= SPELLID_FIRST_AID,
 			},
 			MSBT_TRIGGER_LOW_MANA = {
+				disabled		= true,
 				colorR			= 0.5,
 				colorG			= 0.5,
 				message			= L.MSG_TRIGGER_LOW_MANA .. "! (%a)",
 				alwaysSticky	= true,
 				fontSize		= 26,
-				soundFile		= "MSBT Low Mana",
 				classes			= "DRUID,MAGE,PALADIN,PRIEST,SHAMAN,WARLOCK",
 				mainEvents		= "UNIT_POWER_UPDATE{powerType;;eq;;0;;unitID;;eq;;player;;threshold;;lt;;35}",
 				exceptions		= "recentlyFired;;lt;;5",
@@ -1357,68 +1165,7 @@ if IsClassic then
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;pet;;threshold;;lt;;40}",
 				exceptions		= "recentlyFired;;lt;;5",
 			},
-			MSBT_TRIGGER_MAELSTROM_WEAPON = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_MAELSTROM_WEAPON .. " x5!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "SHAMAN",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MAELSTROM_WEAPON .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			--[[MSBT_TRIGGER_MANA_TEA = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_MANA_TEA .. " x%a!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MONK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MANA_TEA .. ";;amount;;eq;;20;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-			MSBT_TRIGGER_MISSILE_BARRAGE = {
-				colorG			= 0.725,
-				message			= SPELL_MISSILE_BARRAGE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MAGE",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MISSILE_BARRAGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			--[[MSBT_TRIGGER_MOLTEN_CORE = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_MOLTEN_CORE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARLOCK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MOLTEN_CORE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_NIGHTFALL = {
-				colorR			= 0.709,
-				colorG			= 0,
-				colorB			= 0.709,
-				message			= SPELL_NIGHTFALL .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARLOCK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHADOW_TRANCE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			MSBT_TRIGGER_PVP_TRINKET = {
-				colorB			= 0,
-				message			= SPELL_PVP_TRINKET .. "! (%r)",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_PVP_TRINKET .. ";;recipientReaction;;eq;;" .. REACTION_HOSTILE .. "}",
-				exceptions		= "zoneType;;ne;;arena",
-			},
-			MSBT_TRIGGER_PREDATORS_SWIFTNESS = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_PREDATORS_SWIFTNESS .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DRUID",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_PREDATORS_SWIFTNESS .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
+
 			MSBT_TRIGGER_REVENGE = {
 				colorB			= 0,
 				message			= SPELL_REVENGE .. "!",
@@ -1429,130 +1176,20 @@ if IsClassic then
 				exceptions		= "warriorStance;;ne;;2;;unavailableSkill;;eq;;" .. SPELL_REVENGE .. ";;recentlyFired;;lt;;2",
 				iconSkill		= SPELLID_REVENGE,
 			},
-			MSBT_TRIGGER_RIME = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_RIME .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DEATHKNIGHT",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_FREEZING_FOG .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			--[[MSBT_TRIGGER_SHADOW_INFUSION = {
-				colorR			= 0.709,
-				colorG			= 0,
-				colorB			= 0.709,
-				message			= SPELL_SHADOW_INFUSION .. " x5!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DEATHKNIGHT",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHADOW_INFUSION .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_SHOOTING_STARS = {
-				colorG			= 0.725,
-				message			= SPELL_SHOOTING_STARS .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DRUID",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHOOTING_STARS .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			MSBT_TRIGGER_SUDDEN_DEATH = {
-				colorG			= 0,
-				colorB			= 0,
-				message			= SPELL_SUDDEN_DEATH .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SUDDEN_DEATH .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			MSBT_TRIGGER_SWORD_AND_BOARD = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_SWORD_AND_BOARD .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SWORD_AND_BOARD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-				exceptions		= "unavailableSkill;;eq;;" .. SPELL_SHIELD_SLAM,
-			},
-			MSBT_TRIGGER_TASTE_FOR_BLOOD = {
-				colorR			= 0.627,
-				colorG			= 0.5,
-				colorB			= 0,
-				message			= SPELL_TASTE_FOR_BLOOD .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TASTE_FOR_BLOOD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			MSBT_TRIGGER_THE_ART_OF_WAR = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_THE_ART_OF_WAR .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "PALADIN",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_THE_ART_OF_WAR .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			MSBT_TRIGGER_TIDAL_WAVES = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_TIDAL_WAVES .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "SHAMAN",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TIDAL_WAVES .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			--[[MSBT_TRIGGER_ULTIMATUM = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_ULTIMATUM .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ULTIMATUM .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			MSBT_TRIGGER_VICTORY_RUSH = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_VICTORY_RUSH .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "PARTY_KILL{sourceAffiliation;;eq;;" .. FLAG_YOU .. "}",
-				exceptions		= "unavailableSkill;;eq;;" .. SPELL_VICTORY_RUSH .. ";;trivialTarget;;eq;;true;;recentlyFired;;lt;;2",
-				iconSkill		= SPELLID_VICTORY_RUSH,
-			},
-			--[[MSBT_TRIGGER_VITAL_MISTS = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_VITAL_MISTS .. " x%a!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MONK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_VITAL_MISTS .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-		}, -- End triggers
 
+		},
 
-		-- Master font settings.
-		normalFontName		= L.DEFAULT_FONT_NAME,
-		normalOutlineIndex	= 1,
-		normalFontSize		= 18,
-		normalFontAlpha		= 100,
-		critFontName		= L.DEFAULT_FONT_NAME,
-		critOutlineIndex	= 1,
-		critFontSize		= 26,
-		critFontAlpha		= 100,
+		normalFontName			= L.DEFAULT_FONT_NAME,
+		normalOutlineIndex		= 1,
+		normalFontSize			= 18,
+		normalFontAlpha			= 100,
+		critFontName			= L.DEFAULT_FONT_NAME,
+		critOutlineIndex		= 1,
+		critFontSize			= 26,
+		critFontAlpha			= 100,
 
+		animationSpeed			= 100,
 
-		-- Animation speed.
-		animationSpeed		= 100,
-
-		lootProcessDelay	= 0.15,
-
-
-		-- Partial effect settings.
 		crushing		= { colorR = 0.5, colorG = 0, colorB = 0, trailer = string_gsub(CRUSHING_TRAILER, "%((.+)%)", "<%1>") },
 		glancing		= { colorR = 1, colorG = 0, colorB = 0, trailer = string_gsub(GLANCING_TRAILER, "%((.+)%)", "<%1>") },
 		absorb			= { colorR = 1, colorG = 1, colorB = 0, trailer = string_gsub(string_gsub(ABSORB_TRAILER, "%((.+)%)", "<%1>"), "%%d", "%%a") },
@@ -1561,20 +1198,40 @@ if IsClassic then
 		overheal		= { colorR = 0, colorG = 0.705, colorB = 0.5, trailer = " <%a>" },
 		overkill		= { disabled = true, colorR = 0.83, colorG = 0, colorB = 0.13, trailer = " <%a>" },
 
-
-		-- Damage color settings.
 		physical		= { colorR = 1, colorG = 1, colorB = 1 },
-		holy			= { colorR = 1, colorG = 1, colorB = 0.627 },
-		fire			= { colorR = 1, colorG = 0.5, colorB = 0.5 },
-		nature			= { colorR = 0.5, colorG = 1, colorB = 0.5 },
-		frost			= { colorR = 0.5, colorG = 0.5, colorB = 1 },
-		shadow			= { colorR = 0.628, colorG = 0, colorB = 0.628 },
-		arcane			= { colorR = 1, colorG = 0.725, colorB = 1 },
-		frostfire		= { colorR = 0.824, colorG = 0.314, colorB = 0.471 },
-		shadowflame		= { colorR = 0.824, colorG = 0.5, colorB = 0.628 },
+		arcane			= { colorR = 0.956, colorG = 0.658, colorB = 0.894 },
+		fire			= { colorR = 0.933, colorG = 0.490, colorB = 0.501 },
+		frost			= { colorR = 0.462, colorG = 0.792, colorB = 0.929 },
+		holy			= { colorR = 0.976, colorG = 0.945, colorB = 0.631 },
+		nature			= { colorR = 0.631, colorG = 0.858, colorB = 0.396 },
+		shadow			= { colorR = 0.356, colorG = 0.290, colorB = 0.596 },
+		spellfire		= { colorR = 0.898, colorG = 0.360, colorB = 0.501 },
+		spellfrost		= { colorR = 0.321, colorG = 0.321, colorB = 0.8 },
+		divine			= { colorR = 0.956, colorG = 0.894, colorB = 0.572 },
+		astral			= { colorR = 0.737, colorG = 0.411, colorB = 0.968 },
+		spellshadow		= { colorR = 0.450, colorG = 0.215, colorB = 0.6 },
+		radiant			= { colorR = 0.937, colorG = 0.690, colorB = 0.396 },
+		holystorm		= { colorR = 0.752, colorG = 0.909, colorB = 0.545 },
+		holyfrost		= { colorR = 0.545, colorG = 0.909, colorB = 0.874 },
+		volcanic		= { colorR = 0.937, colorG = 0.545, colorB = 0.282 },
+		shadowflame		= { colorR = 0.745, colorG = 0.333, colorB = 0.529 },
+		frostfire		= { colorR = 0.262, colorG = 0.572, colorB = 0.666 },
+		froststorm		= { colorR = 0.356, colorG = 0.698, colorB = 0.556 },
+		shadowfrost		= { colorR = 0.2, colorG = 0.317, colorB = 0.607 },
+		twilight		= { colorR = 0.631, colorG = 0.349, colorB = 0.698 },
+		plague			= { colorR = 0.584, colorG = 0.8, colorB = 0.329 },
+		spellstrike		= { colorR = 0.941, colorG = 0.866, colorB = 0.929 },
+		flamestrike		= { colorR = 0.968, colorG = 0.764, colorB = 0.749 },
+		froststrike		= { colorR = 0.678, colorG = 0.858, colorB = 0.890 },
+		stormstrike		= { colorR = 0.698, colorG = 0.792, colorB = 0.8 },
+		shadowstrike	= { colorR = 0.827, colorG = 0.8, colorB = 0.949 },
+		holystrike		= { colorR = 0.968, colorG = 0.925, colorB = 0.796 },
+		elemental		= { colorR = 0.337, colorG = 0.858, colorB = 0.682 },
+		cosmic			= { colorR = 0.368, colorG = 0.627, colorB = 0.8 },
+		chromatic		= { colorR = 0.573, colorG = 0.976, colorB = 0.098 },
+		magic			= { colorR = 0.470, colorG = 0.937, colorB = 1 },
+		chaos			= { colorR = 0.247, colorG = 0.152, colorB = 0.4 },
 
-
-		-- Class color settings.
 		DEATHKNIGHT		= CreateClassSettingsTable("DEATHKNIGHT"),
 		DRUID			= CreateClassSettingsTable("DRUID"),
 		HUNTER			= CreateClassSettingsTable("HUNTER"),
@@ -1587,54 +1244,50 @@ if IsClassic then
 		WARLOCK			= CreateClassSettingsTable("WARLOCK"),
 		WARRIOR			= CreateClassSettingsTable("WARRIOR"),
 		DEMONHUNTER		= CreateClassSettingsTable("DEMONHUNTER"),
+		EVOKER			= CreateClassSettingsTable("EVOKER"),
 
-
-		-- Throttle settings.
-		dotThrottleDuration	= 3,
-		hotThrottleDuration	= 3,
-		powerThrottleDuration	= 3,
+		dotThrottleDuration				= 3,
+		hotThrottleDuration				= 3,
+		powerThrottleDuration			= 3,
 		throttleList = {
-			--[SPELL_BLOOD_PRESENCE]	= 5,
-			--[SPELL_DRAIN_LIFE]		= 3,
-			--[SPELL_SHADOWMEND]		= 5,
-			--[SPELL_REFLECTIVE_SHIELD]	= 5,
+
 			[SPELL_VAMPIRIC_EMBRACE]	= 5,
-			--[SPELL_VAMPIRIC_TOUCH]	= 5,
+
 		},
 
+		mergeExclusions					= {},
+		abilitySubstitutions			= {},
+		abilitySuppressions				= {
 
-		-- Spam control settings.
-		mergeExclusions		= {},
-		abilitySubstitutions	= {},
-		abilitySuppressions	= {
-			--[SPELL_UNDYING_RESOLVE]		= true,
 		},
-		damageThreshold		= 0,
-		healThreshold			= 0,
-		powerThreshold			= 0,
-		hideFullHoTOverheals	= true,
-		shortenNumbers			= false,
-		shortenNumberPrecision	= 0,
-		groupNumbers			= false,
+		damageThreshold					= 0,
+		healThreshold					= 0,
+		powerThreshold					= 0,
+		hideFullHoTOverheals			= true,
+		shortenNumbers					= false,
+		stackSimilarHits				= false,
+		disableOutgoingInGroup			= false,
+		disableIncomingInGroup			= false,
+		disableNotificationInGroup		= false,
+		disableStaticInGroup			= false,
+		enableBlizzardV2CombatText		= false,
+		enableBlizzardV2CombatTextInGroup = false,
+		shortenNumberPrecision			= 0,
+		groupNumbers					= false,
 
-
-		-- Cooldown settings.
-		cooldownExclusions		= {},
-		ignoreCooldownThreshold		= {},
-		cooldownThreshold		= 5,
-
-
-		-- Loot settings.
-		qualityExclusions		= {
+		cooldownExclusions = {},
+		ignoreCooldownThreshold = {},
+		cooldownThreshold = 5,
+		qualityExclusions				= {
 			[LE_ITEM_QUALITY_POOR or Enum.ItemQuality.Poor] = true,
 		},
-		alwaysShowQuestItems	= true,
-		itemsAllowed			= {},
-		itemExclusions			= {},
+		alwaysShowQuestItems			= true,
+		itemsAllowed					= {},
+		itemExclusions					= {},
 	}
 else
 	masterProfile = {
-		-- Scroll area settings.
+
 		scrollAreas = {
 			Incoming = {
 				name					= L.MSG_INCOMING,
@@ -1676,8 +1329,6 @@ else
 			},
 		},
 
-
-		-- Built-in event settings.
 		events = {
 			INCOMING_DAMAGE = {
 				colorG		= 0,
@@ -1891,7 +1542,6 @@ else
 				scrollArea	= "Incoming",
 			},
 
-
 			OUTGOING_DAMAGE = {
 				message		= "%a",
 				scrollArea	= "Outgoing",
@@ -2058,7 +1708,6 @@ else
 				scrollArea	= "Outgoing",
 			},
 
-
 			PET_INCOMING_DAMAGE = {
 				colorG		= 0.41,
 				colorB		= 0.41,
@@ -2224,7 +1873,6 @@ else
 				scrollArea	= "Incoming",
 				isCrit		= true,
 			},
-
 
 			PET_OUTGOING_DAMAGE = {
 				colorG		= 0.5,
@@ -2415,7 +2063,6 @@ else
 				scrollArea	= "Outgoing",
 			},
 
-
 			NOTIFICATION_DEBUFF = {
 				colorR		= 0,
 				colorG		= 0.5,
@@ -2543,6 +2190,18 @@ else
 				alwaysSticky	= true,
 				fontSize		= 26,
 			},
+			NOTIFICATION_ESSENCE_CHANGE = {
+				colorG		= 0.5,
+				colorB		= 0,
+				message		= "%a " .. L.MSG_ESSENCE,
+			},
+			NOTIFICATION_ESSENCE_FULL = {
+				colorG			= 0.5,
+				colorB			= 0,
+				message			= L.MSG_ESSENCE_FULL .. "!",
+				alwaysSticky	= true,
+				fontSize		= 26,
+			},
 			NOTIFICATION_HONOR_GAIN = {
 				colorR		= 0.5,
 				colorG		= 0.5,
@@ -2611,37 +2270,12 @@ else
 				message		= "+%e",
 				scrollArea	= "Static",
 			},
-			NOTIFICATION_COOLDOWN = {
-				message		= "%e " .. L.MSG_READY_NOW .. "!",
-				scrollArea	= "Static",
-				fontSize	= 22,
-				soundFile	= "MSBT Cooldown",
-				skillColorR	= 1,
-				skillColorG	= 0,
-				skillColorB	= 0,
-			},
-			NOTIFICATION_PET_COOLDOWN = {
-				colorR		= 0.57,
-				colorG		= 0.58,
-				message		= PET .. " %e " .. L.MSG_READY_NOW .. "!",
-				scrollArea	= "Static",
-				fontSize	= 22,
-				soundFile	= "MSBT Cooldown",
-				skillColorR	= 1,
-				skillColorG	= 0.41,
-				skillColorB	= 0.41,
-			},
 			NOTIFICATION_ITEM_COOLDOWN = {
-				colorR		= 0.784,
-				colorG		= 0.784,
-				colorB		= 0,
-				message		= " %e " .. L.MSG_READY_NOW .. "!",
-				scrollArea	= "Static",
-				fontSize	= 22,
-				soundFile	= "MSBT Cooldown",
-				skillColorR	= 1,
-				skillColorG	= 0.588,
-				skillColorB	= 0.588,
+				colorR = 0.784, colorG = 0.784, colorB = 0,
+				message = " %e " .. L.MSG_READY_NOW .. "!",
+				scrollArea = "Static", fontSize = 22,
+				soundFile = "MSBT Cooldown",
+				skillColorR = 1, skillColorG = 0.588, skillColorB = 0.588,
 			},
 			NOTIFICATION_LOOT = {
 				colorB		= 0,
@@ -2653,49 +2287,10 @@ else
 				message		= "+%a %e (%t)",
 				scrollArea	= "Static",
 			},
-		}, -- End events
+		},
 
-
-		-- Default trigger settings.
 		triggers = {
-			--[[MSBT_TRIGGER_BERSERK = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_BERSERK,
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DRUID",
-				mainEvents		= "SPELL_AURA_APPLIED{skillID;;eq;;" .. SPELLID_BERSERK .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_BLINDSIDE = {
-				colorR			= 0.709,
-				colorG			= 0,
-				colorB			= 0.709,
-				message			= SPELL_BLINDSIDE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "ROGUE",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BLINDSIDE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-			--[[MSBT_TRIGGER_BLOODSURGE = {
-				colorR			= 0.8,
-				colorG			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_BLOODSURGE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BLOODSURGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-			MSBT_TRIGGER_BRAIN_FREEZE = {
-				colorG			= 0.627,
-				colorB			= 0.627,
-				message			= SPELL_BRAIN_FREEZE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MAGE",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_BF_FIREBALL .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
+
 			MSBT_TRIGGER_CLEARCASTING = {
 				colorB			= 0,
 				message			= SPELL_CLEARCASTING .. "!",
@@ -2704,16 +2299,8 @@ else
 				classes			= "DRUID,MAGE,PRIEST,SHAMAN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_CLEARCASTING .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_DECIMATION = {
-				colorG			= 0.627,
-				colorB			= 0.627,
-				message			= SPELL_DECIMATION .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARLOCK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_DECIMATION .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_ELUSIVE_BREW = {
+
+			MSBT_TRIGGER_ELUSIVE_BREW = {
 				colorB			= 0,
 				message			= SPELL_ELUSIVE_BREW .. " x%a!",
 				alwaysSticky	= true,
@@ -2722,7 +2309,7 @@ else
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}&&" ..
 								"SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;10;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}&&" ..
 								"SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ELUSIVE_BREW .. ";;amount;;eq;;15;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
 			MSBT_TRIGGER_EXECUTE = {
 				colorB			= 0,
 				message			= SPELL_EXECUTE .. "!",
@@ -2753,17 +2340,7 @@ else
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_HAMMER_OF_WRATH,
 				iconSkill		= SPELLID_HAMMER_OF_WRATH,
 			},
-			MSBT_TRIGGER_KILL_SHOT = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_KILL_SHOT .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "HUNTER",
-				mainEvents		= "UNIT_HEALTH{unitID;;eq;;target;;threshold;;lt;;20;;unitReaction;;eq;;" .. REACTION_HOSTILE .. "}",
-				exceptions		= "unavailableSkill;;eq;;" .. SPELL_KILL_SHOT,
-				iconSkill		= SPELLID_KILL_SHOT,
-			},
+
 			MSBT_TRIGGER_KILLING_MACHINE = {
 				colorR			= 0.118,
 				colorG			= 0.882,
@@ -2773,7 +2350,7 @@ else
 				classes			= "DEATHKNIGHT",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_KILLING_MACHINE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_LAVA_SURGE = {
+			MSBT_TRIGGER_LAVA_SURGE = {
 				colorG			= 0.341,
 				colorB			= 0.129,
 				message			= SPELL_LAVA_SURGE,
@@ -2781,35 +2358,26 @@ else
 				fontSize		= 26,
 				classes			= "SHAMAN",
 				mainEvents		= "SPELL_CAST_SUCCESS{sourceAffiliation;;eq;;" .. FLAG_YOU .. ";;skillID;;eq;;" .. SPELLID_LAVA_SURGE .. "}",
-			},]]
-			--[[MSBT_TRIGGER_LOCK_AND_LOAD = {
-				colorR			= 0.627,
-				colorG			= 0.5,
-				colorB			= 0,
-				message			= SPELL_LOCK_AND_LOAD .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "HUNTER",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_LOCK_AND_LOAD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+			},
+
 			MSBT_TRIGGER_LOW_HEALTH = {
+				disabled		= true,
 				colorG			= 0.5,
 				colorB			= 0.5,
 				message			= L.MSG_TRIGGER_LOW_HEALTH .. "! (%a)",
 				alwaysSticky	= true,
 				fontSize		= 26,
-				soundFile		= "MSBT Low Health",
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;player;;threshold;;lt;;35}",
 				exceptions		= "recentlyFired;;lt;;5",
 				iconSkill		= SPELLID_FIRST_AID,
 			},
 			MSBT_TRIGGER_LOW_MANA = {
+				disabled		= true,
 				colorR			= 0.5,
 				colorG			= 0.5,
 				message			= L.MSG_TRIGGER_LOW_MANA .. "! (%a)",
 				alwaysSticky	= true,
 				fontSize		= 26,
-				soundFile		= "MSBT Low Mana",
 				classes			= "DRUID,MAGE,PALADIN,PRIEST,SHAMAN,WARLOCK",
 				mainEvents		= "UNIT_POWER_UPDATE{powerType;;eq;;0;;unitID;;eq;;player;;threshold;;lt;;35}",
 				exceptions		= "recentlyFired;;lt;;5",
@@ -2823,24 +2391,7 @@ else
 				mainEvents		= "UNIT_HEALTH{unitID;;eq;;pet;;threshold;;lt;;40}",
 				exceptions		= "recentlyFired;;lt;;5",
 			},
-			MSBT_TRIGGER_MAELSTROM_WEAPON = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_MAELSTROM_WEAPON .. " x5!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "SHAMAN",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MAELSTROM_WEAPON .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			--[[MSBT_TRIGGER_MANA_TEA = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_MANA_TEA .. " x%a!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MONK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MANA_TEA .. ";;amount;;eq;;20;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
+
 			MSBT_TRIGGER_MISSILE_BARRAGE = {
 				colorG			= 0.725,
 				message			= SPELL_MISSILE_BARRAGE .. "!",
@@ -2849,25 +2400,7 @@ else
 				classes			= "MAGE",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MISSILE_BARRAGE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_MOLTEN_CORE = {
-				colorG			= 0.25,
-				colorB			= 0.25,
-				message			= SPELL_MOLTEN_CORE .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARLOCK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_MOLTEN_CORE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_NIGHTFALL = {
-				colorR			= 0.709,
-				colorG			= 0,
-				colorB			= 0.709,
-				message			= SPELL_NIGHTFALL .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARLOCK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHADOW_TRANCE .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+
 			MSBT_TRIGGER_PVP_TRINKET = {
 				colorB			= 0,
 				message			= SPELL_PVP_TRINKET .. "! (%r)",
@@ -2904,24 +2437,7 @@ else
 				classes			= "DEATHKNIGHT",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_FREEZING_FOG .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_SHADOW_INFUSION = {
-				colorR			= 0.709,
-				colorG			= 0,
-				colorB			= 0.709,
-				message			= SPELL_SHADOW_INFUSION .. " x5!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DEATHKNIGHT",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHADOW_INFUSION .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
-			--[[MSBT_TRIGGER_SHOOTING_STARS = {
-				colorG			= 0.725,
-				message			= SPELL_SHOOTING_STARS .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "DRUID",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SHOOTING_STARS .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+
 			MSBT_TRIGGER_SUDDEN_DEATH = {
 				colorG			= 0,
 				colorB			= 0,
@@ -2931,35 +2447,7 @@ else
 				classes			= "WARRIOR",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SUDDEN_DEATH .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			MSBT_TRIGGER_SWORD_AND_BOARD = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_SWORD_AND_BOARD .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_SWORD_AND_BOARD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-				exceptions		= "unavailableSkill;;eq;;" .. SPELL_SHIELD_SLAM,
-			},
-			MSBT_TRIGGER_TASTE_FOR_BLOOD = {
-				colorR			= 0.627,
-				colorG			= 0.5,
-				colorB			= 0,
-				message			= SPELL_TASTE_FOR_BLOOD .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TASTE_FOR_BLOOD .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
-			MSBT_TRIGGER_THE_ART_OF_WAR = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_THE_ART_OF_WAR .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "PALADIN",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_THE_ART_OF_WAR .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},
+
 			MSBT_TRIGGER_TIDAL_WAVES = {
 				colorR			= 0,
 				colorG			= 0.5,
@@ -2969,15 +2457,7 @@ else
 				classes			= "SHAMAN",
 				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_TIDAL_WAVES .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
 			},
-			--[[MSBT_TRIGGER_ULTIMATUM = {
-				colorR			= 0,
-				colorG			= 0.5,
-				message			= SPELL_ULTIMATUM .. "!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "WARRIOR",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_ULTIMATUM .. ";;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}",
-			},]]
+
 			MSBT_TRIGGER_VICTORY_RUSH = {
 				colorG			= 0.25,
 				colorB			= 0.25,
@@ -2989,35 +2469,20 @@ else
 				exceptions		= "unavailableSkill;;eq;;" .. SPELL_VICTORY_RUSH .. ";;trivialTarget;;eq;;true;;recentlyFired;;lt;;2",
 				iconSkill		= SPELLID_VICTORY_RUSH,
 			},
-			--[[MSBT_TRIGGER_VITAL_MISTS = {
-				colorR			= 0.5,
-				colorB			= 0.5,
-				message			= SPELL_VITAL_MISTS .. " x%a!",
-				alwaysSticky	= true,
-				fontSize		= 26,
-				classes			= "MONK",
-				mainEvents		= "SPELL_AURA_APPLIED{skillName;;eq;;" .. SPELL_VITAL_MISTS .. ";;amount;;eq;;5;;recipientAffiliation;;eq;;" .. FLAG_YOU .. "}"
-			},]]
-		}, -- End triggers
 
+		},
 
-		-- Master font settings.
-		normalFontName		= L.DEFAULT_FONT_NAME,
-		normalOutlineIndex	= 1,
-		normalFontSize		= 18,
-		normalFontAlpha		= 100,
-		critFontName		= L.DEFAULT_FONT_NAME,
-		critOutlineIndex	= 1,
-		critFontSize		= 26,
-		critFontAlpha		= 100,
+		normalFontName			= L.DEFAULT_FONT_NAME,
+		normalOutlineIndex		= 1,
+		normalFontSize			= 18,
+		normalFontAlpha			= 100,
+		critFontName			= L.DEFAULT_FONT_NAME,
+		critOutlineIndex		= 1,
+		critFontSize			= 26,
+		critFontAlpha			= 100,
 
+		animationSpeed			= 100,
 
-		-- Animation speed.
-		animationSpeed		= 100,
-
-		lootProcessDelay	= 0.15,
-
-		-- Partial effect settings.
 		crushing		= { colorR = 0.5, colorG = 0, colorB = 0, trailer = string_gsub(CRUSHING_TRAILER, "%((.+)%)", "<%1>") },
 		glancing		= { colorR = 1, colorG = 0, colorB = 0, trailer = string_gsub(GLANCING_TRAILER, "%((.+)%)", "<%1>") },
 		absorb			= { colorR = 1, colorG = 1, colorB = 0, trailer = string_gsub(string_gsub(ABSORB_TRAILER, "%((.+)%)", "<%1>"), "%%d", "%%a") },
@@ -3026,20 +2491,40 @@ else
 		overheal		= { colorR = 0, colorG = 0.705, colorB = 0.5, trailer = " <%a>" },
 		overkill		= { disabled = true, colorR = 0.83, colorG = 0, colorB = 0.13, trailer = " <%a>" },
 
-
-		-- Damage color settings.
 		physical		= { colorR = 1, colorG = 1, colorB = 1 },
-		holy			= { colorR = 1, colorG = 1, colorB = 0.627 },
-		fire			= { colorR = 1, colorG = 0.5, colorB = 0.5 },
-		nature			= { colorR = 0.5, colorG = 1, colorB = 0.5 },
-		frost			= { colorR = 0.5, colorG = 0.5, colorB = 1 },
-		shadow			= { colorR = 0.628, colorG = 0, colorB = 0.628 },
-		arcane			= { colorR = 1, colorG = 0.725, colorB = 1 },
-		frostfire		= { colorR = 0.824, colorG = 0.314, colorB = 0.471 },
-		shadowflame		= { colorR = 0.824, colorG = 0.5, colorB = 0.628 },
+		arcane			= { colorR = 0.956, colorG = 0.658, colorB = 0.894 },
+		fire			= { colorR = 0.933, colorG = 0.490, colorB = 0.501 },
+		frost			= { colorR = 0.462, colorG = 0.792, colorB = 0.929 },
+		holy			= { colorR = 0.976, colorG = 0.945, colorB = 0.631 },
+		nature			= { colorR = 0.631, colorG = 0.858, colorB = 0.396 },
+		shadow			= { colorR = 0.356, colorG = 0.290, colorB = 0.596 },
+		spellfire		= { colorR = 0.898, colorG = 0.360, colorB = 0.501 },
+		spellfrost		= { colorR = 0.321, colorG = 0.321, colorB = 0.8 },
+		divine			= { colorR = 0.956, colorG = 0.894, colorB = 0.572 },
+		astral			= { colorR = 0.737, colorG = 0.411, colorB = 0.968 },
+		spellshadow		= { colorR = 0.450, colorG = 0.215, colorB = 0.6 },
+		radiant			= { colorR = 0.937, colorG = 0.690, colorB = 0.396 },
+		holystorm		= { colorR = 0.752, colorG = 0.909, colorB = 0.545 },
+		holyfrost		= { colorR = 0.545, colorG = 0.909, colorB = 0.874 },
+		volcanic		= { colorR = 0.937, colorG = 0.545, colorB = 0.282 },
+		shadowflame		= { colorR = 0.745, colorG = 0.333, colorB = 0.529 },
+		frostfire		= { colorR = 0.262, colorG = 0.572, colorB = 0.666 },
+		froststorm		= { colorR = 0.356, colorG = 0.698, colorB = 0.556 },
+		shadowfrost		= { colorR = 0.2, colorG = 0.317, colorB = 0.607 },
+		twilight		= { colorR = 0.631, colorG = 0.349, colorB = 0.698 },
+		plague			= { colorR = 0.584, colorG = 0.8, colorB = 0.329 },
+		spellstrike		= { colorR = 0.941, colorG = 0.866, colorB = 0.929 },
+		flamestrike		= { colorR = 0.968, colorG = 0.764, colorB = 0.749 },
+		froststrike		= { colorR = 0.678, colorG = 0.858, colorB = 0.890 },
+		stormstrike		= { colorR = 0.698, colorG = 0.792, colorB = 0.8 },
+		shadowstrike	= { colorR = 0.827, colorG = 0.8, colorB = 0.949 },
+		holystrike		= { colorR = 0.968, colorG = 0.925, colorB = 0.796 },
+		elemental		= { colorR = 0.337, colorG = 0.858, colorB = 0.682 },
+		cosmic			= { colorR = 0.368, colorG = 0.627, colorB = 0.8 },
+		chromatic		= { colorR = 0.573, colorG = 0.976, colorB = 0.098 },
+		magic			= { colorR = 0.470, colorG = 0.937, colorB = 1 },
+		chaos			= { colorR = 0.247, colorG = 0.152, colorB = 0.4 },
 
-
-		-- Class color settings.
 		DEATHKNIGHT		= CreateClassSettingsTable("DEATHKNIGHT"),
 		DRUID			= CreateClassSettingsTable("DRUID"),
 		HUNTER			= CreateClassSettingsTable("HUNTER"),
@@ -3052,93 +2537,68 @@ else
 		WARLOCK			= CreateClassSettingsTable("WARLOCK"),
 		WARRIOR			= CreateClassSettingsTable("WARRIOR"),
 		DEMONHUNTER		= CreateClassSettingsTable("DEMONHUNTER"),
+		EVOKER			= CreateClassSettingsTable("EVOKER"),
 
-
-		-- Throttle settings.
-		dotThrottleDuration	= 3,
-		hotThrottleDuration	= 3,
-		powerThrottleDuration	= 3,
+		dotThrottleDuration				= 3,
+		hotThrottleDuration				= 3,
+		powerThrottleDuration			= 3,
 		throttleList = {
-			--[SPELL_BLOOD_PRESENCE]	= 5,
-			[SPELL_DRAIN_LIFE]		= 3,
-			[SPELL_SHADOWMEND]		= 5,
-			--[SPELL_REFLECTIVE_SHIELD]	= 5,
+
+			[SPELL_DRAIN_LIFE]			= 3,
+			[SPELL_SHADOWMEND]			= 5,
+
 			[SPELL_VAMPIRIC_EMBRACE]	= 5,
-			[SPELL_VAMPIRIC_TOUCH]	= 5,
+			[SPELL_VAMPIRIC_TOUCH]		= 5,
 		},
 
-
-		-- Spam control settings.
-		mergeExclusions		= {},
-		abilitySubstitutions	= {},
-		abilitySuppressions	= {
+		mergeExclusions					= {},
+		abilitySubstitutions			= {},
+		abilitySuppressions				= {
 			[SPELL_UNDYING_RESOLVE]		= true,
 		},
-		damageThreshold		= 0,
-		healThreshold			= 0,
-		powerThreshold			= 0,
-		hideFullHoTOverheals	= true,
-		shortenNumbers			= false,
-		shortenNumberPrecision	= 0,
-		groupNumbers			= false,
+		damageThreshold					= 0,
+		healThreshold					= 0,
+		powerThreshold					= 0,
+		hideFullHoTOverheals			= true,
+		shortenNumbers					= false,
+		stackSimilarHits				= false,
+		disableOutgoingInGroup			= false,
+		disableIncomingInGroup			= false,
+		disableNotificationInGroup		= false,
+		disableStaticInGroup			= false,
+		enableBlizzardV2CombatText		= false,
+		enableBlizzardV2CombatTextInGroup = false,
+		shortenNumberPrecision			= 0,
+		groupNumbers					= false,
 
-
-		-- Cooldown settings.
-		cooldownExclusions		= {},
-		ignoreCooldownThreshold		= {},
-		cooldownThreshold		= 5,
-
-
-		-- Loot settings.
-		qualityExclusions		= {
+		cooldownExclusions = {},
+		ignoreCooldownThreshold = {},
+		cooldownThreshold = 5,
+		qualityExclusions				= {
 			[LE_ITEM_QUALITY_POOR or Enum.ItemQuality.Poor] = true,
 		},
-		alwaysShowQuestItems	= true,
-		itemsAllowed			= {},
-		itemExclusions			= {},
+		alwaysShowQuestItems			= true,
+		itemsAllowed					= {},
+		itemExclusions					= {},
 	}
 end
 
-
-
--------------------------------------------------------------------------------
--- Utility functions.
--------------------------------------------------------------------------------
-
--- ****************************************************************************
--- Dynamically loads the and displays the options.
--- ****************************************************************************
 local function ShowOptions()
-	-- Load the options module if it's not already loaded.
-	local optionsName = "MSBTOptions"
-	if (not IsAddOnLoaded(optionsName)) then
-		local loaded, failureReason = LoadAddOn(optionsName)
-
-		-- Display an error message indicating why the module wasn't loaded if it
-		-- didn't load properly.
-		if (not loaded) then
-			local failureMessage = _G["ADDON_" .. failureReason] or failureReason or ""
-			Print(string_format(ADDON_LOAD_FAILED, optionsName, failureMessage))
-		end
+	if (MSBTOptions and MSBTOptions.Main and MSBTOptions.Main.ShowMainFrame) then
+		MSBTOptions.Main.ShowMainFrame()
+		return
 	end
 
-	-- Display the main frame if the options module is loaded.
-	if (IsAddOnLoaded(optionsName)) then MSBTOptions.Main.ShowMainFrame() end
+	Print("MSBT options are unavailable. Ensure embedded options files are enabled in MikScrollingBattleText.toc.")
 end
 
-
--- ****************************************************************************
--- Recursively removes empty tables and their differential map entries.
--- ****************************************************************************
 local function RemoveEmptyDifferentials(currentTable)
-	-- Find nested tables in the current table.
+
 	for fieldName, fieldValue in pairs(currentTable) do
 		if (type(fieldValue) == "table") then
-			-- Recursively clear empty tables in the nested table.
+
 			RemoveEmptyDifferentials(fieldValue)
 
-			-- Remove the table from the differential map and current table if it's
-			-- empty.
 			if (not next(fieldValue)) then
 				differentialMap[fieldValue] = nil
 				differentialCache[#differentialCache+1] = fieldValue
@@ -3148,70 +2608,51 @@ local function RemoveEmptyDifferentials(currentTable)
 	end
 end
 
-
--- ****************************************************************************
--- Recursively associates the tables in the passed saved table to corresponding
--- entries in the passed master table.
--- ****************************************************************************
 local function AssociateDifferentialTables(savedTable, masterTable)
-	-- Associate the saved table with the corresponding master entry.
+
 	differentialMap[savedTable] = masterTable
 	setmetatable(savedTable, differential_mt)
 
-	-- Look for nested tables that have a corresponding master entry.
 	for fieldName, fieldValue in pairs(savedTable) do
 		if (type(fieldValue) == "table" and type(masterTable[fieldName]) == "table") then
-			-- Recursively call the function to associate nested tables.
+
 			AssociateDifferentialTables(fieldValue, masterTable[fieldName])
 		end
 	end
 end
 
-
--- ****************************************************************************
--- Set the passed option to the current profile while handling differential
--- profile mechanics.
--- ****************************************************************************
 local function SetOption(optionPath, optionName, optionValue, optionDefault)
-	-- Clear the path table.
+
 	EraseTable(pathTable)
 
-	-- Split the passed option path into the path table.
 	if (optionPath) then SplitString(optionPath, "%.", pathTable) end
 
-	-- Attempt to go to the option path in the master profile.
 	local masterOption = masterProfile
 	for _, fieldName in ipairs(pathTable) do
 		masterOption = masterOption[fieldName]
 		if (not masterOption) then break end
 	end
 
-	-- Get the option name from the master profile.
 	masterOption = masterOption and masterOption[optionName]
 
-	-- Check if the option being set needs to be overridden.
 	local needsOverride = false
 	if (optionValue ~= masterOption) then needsOverride = true end
 
-	-- Treat a nil master option the same as false.
 	if ((optionValue == false or optionValue == optionDefault) and not masterOption) then
 		needsOverride = false
 	end
 
-	-- Make the option value false if the option being set is nil and the master option set.
 	if (optionValue == nil and masterOption) then optionValue = false end
 
-	-- Start at the root of the current profile and master profile.
 	local currentTable = currentProfile
 	local masterTable = masterProfile
 
-	-- Override needed.
 	if (needsOverride and optionValue ~= nil) then
-		-- Loop through all of the fields in path table.
+
 		for _, fieldName in ipairs(pathTable) do
-			-- Check if the field doesn't exist in the current profile.
+
 			if (not rawget(currentTable, fieldName)) then
-				-- Create a table for the field and setup the associated inheritance table.
+
 				currentTable[fieldName] = table.remove(differentialCache) or {}
 				if (masterTable and masterTable[fieldName]) then
 					differentialMap[currentTable[fieldName]] = masterTable[fieldName]
@@ -3219,23 +2660,19 @@ local function SetOption(optionPath, optionName, optionValue, optionDefault)
 				end
 			end
 
-			-- Move to the next field in the option path.
 			currentTable = currentTable[fieldName]
 			masterTable = masterTable and masterTable[fieldName]
 		end
 
-		-- Set the option's value.
 		currentTable[optionName] = optionValue
 
-	-- Override NOT needed.
 	else
-	-- Attempt to go to the option path in the current profile.
+
 		for _, fieldName in ipairs(pathTable) do
 			currentTable = rawget(currentTable, fieldName)
 			if (not currentTable) then return end
 		end
 
-		-- Clear the option from the path and remove any empty differential tables.
 		if (currentTable) then
 			currentTable[optionName] = nil
 			RemoveEmptyDifferentials(currentProfile)
@@ -3243,84 +2680,138 @@ local function SetOption(optionPath, optionName, optionValue, optionDefault)
 	end
 end
 
-
--- ****************************************************************************
--- Sets up a button to access MSBT's options from the Blizzard interface
--- options AddOns tab.
--- ****************************************************************************
 local function SetupBlizzardOptions()
-	-- Create a container frame for the Blizzard options area.
+
 	local frame = CreateFrame("Frame")
 	frame.name = "MikScrollingBattleText"
 
-	-- Create an option button in the center of the frame to launch MSBT's options.
-	local button = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	local button = CreateFrame("Button", nil, frame, IsCataClassic and "OptionsButtonTemplate" or "UIPanelButtonTemplate")
+	button:SetSize(100, 24)
 	button:SetPoint("CENTER")
 	button:SetText(MikSBT.COMMAND)
-	button:SetScript("OnClick",
-		function (this)
-			InterfaceOptionsFrameCancel_OnClick()
-			HideUIPanel(GameMenuFrame)
-			ShowOptions()
-		end
-	)
+	button:SetScript("OnClick", function(this)
+		ShowOptions()
+	end)
 
-	-- Add the frame as a new category to Blizzard's interface options.
-	InterfaceOptions_AddCategory(frame)
+	if Settings and Settings.RegisterCanvasLayoutCategory then
+		local category = Settings.RegisterCanvasLayoutCategory(frame, frame.name)
+		category.ID = frame.name
+		Settings.RegisterAddOnCategory(category)
+	else
+		InterfaceOptions_AddCategory(frame)
+	end
 end
 
-
--- ****************************************************************************
--- Disable Blizzard's combat text.
--- ****************************************************************************
 local function DisableBlizzardCombatText()
-	-- Turn off Blizzard's default combat text.
-	SetCVar("enableFloatingCombatText", 0)
 	if not IsClassic then
 		SetCVar("floatingCombatTextCombatHealing", 0)
 	end
 	SetCVar("floatingCombatTextCombatDamage", 0)
+	SetCVar("floatingCombatTextCombatHealing_v2", 0)
+	SetCVar("floatingCombatTextCombatDamage_v2", 0)
+	SetCVar("floatingCombatTextCombatLogPeriodicSpells_v2", 0)
+	SetCVar("floatingCombatTextPetMeleeDamage_v2", 0)
+	SetCVar("floatingCombatTextPetSpellDamage_v2", 0)
 	SHOW_COMBAT_TEXT = "0"
-	if (CombatText_UpdateDisplayedMessages) then CombatText_UpdateDisplayedMessages() end
+	if (not Client.hasModernAPI and CombatText_UpdateDisplayedMessages) then CombatText_UpdateDisplayedMessages() end
 end
 
+local function SetBlizzardCombatTextV2Enabled(isEnabled)
+	local value = isEnabled and 1 or 0
+	if not IsClassic then
+		SetCVar("floatingCombatTextCombatHealing", value)
+	end
+	SetCVar("floatingCombatTextCombatDamage", value)
+	SetCVar("floatingCombatTextCombatHealing_v2", value)
+	SetCVar("floatingCombatTextCombatDamage_v2", value)
+	SetCVar("floatingCombatTextCombatLogPeriodicSpells_v2", value)
+	SetCVar("floatingCombatTextPetMeleeDamage_v2", value)
+	SetCVar("floatingCombatTextPetSpellDamage_v2", value)
+	SHOW_COMBAT_TEXT = isEnabled and "1" or "0"
+	if (not Client.hasModernAPI and CombatText_UpdateDisplayedMessages) then CombatText_UpdateDisplayedMessages() end
+end
 
--- ****************************************************************************
--- Set the user disabled option
--- ****************************************************************************
-local function SetOptionUserDisabled(isDisabled)
-	savedVariables.userDisabled = isDisabled or nil
+local function IsInGroupContext()
+	return IsInGroup() or IsInRaid()
+end
 
-	-- Check if the mod is being set to disabled.
-	if (isDisabled) then
-		-- Disable the cooldowns, triggers, event parser, and main modules.
-		MikSBT.Cooldowns.Disable()
-		MikSBT.Triggers.Disable()
-		MikSBT.Parser.Disable()
-		MikSBT.Main.Disable()
-
-	else
-		-- Enable the main, event parser, triggers, and cooldowns modules.
+local function SetAddonEnabled(isEnabled)
+	if isEnabled then
 		MikSBT.Main.Enable()
 		MikSBT.Parser.Enable()
 		MikSBT.Triggers.Enable()
 		MikSBT.Cooldowns.Enable()
+	else
+		MikSBT.Cooldowns.Disable()
+		MikSBT.Triggers.Disable()
+		MikSBT.Parser.Disable()
+		MikSBT.Main.Disable()
 	end
 end
 
+local function GetRuntimeController()
+	if runtimeController then
+		return runtimeController
+	end
 
--- ****************************************************************************
--- Returns whether or not the mod is disabled.
--- ****************************************************************************
+	runtimeController = MikSBT.Configuration.RuntimeController:New({
+		isInGroup = IsInGroupContext,
+		isAddonDisabled = function()
+			return savedVariables and savedVariables.userDisabled
+		end,
+		getProfile = function()
+			return currentProfile
+		end,
+		setAddonEnabled = SetAddonEnabled,
+		setBlizzardEnabled = SetBlizzardCombatTextV2Enabled,
+	})
+
+	return runtimeController
+end
+
+local function ApplyBlizzardCombatTextOptions()
+	GetRuntimeController():ApplyBlizzardState()
+end
+
+local function ResetOfficialBlizzardCombatText()
+	if currentProfile then
+		SetOption(nil, "enableBlizzardV2CombatText", false)
+		SetOption(nil, "enableBlizzardV2CombatTextInGroup", false)
+		SetOption(nil, "disableOutgoingInGroup", false)
+		SetOption(nil, "disableIncomingInGroup", false)
+		SetOption(nil, "disableNotificationInGroup", false)
+		SetOption(nil, "disableStaticInGroup", false)
+	end
+
+	if savedVariables then
+		savedVariables.userDisabled = true
+	end
+
+	SetCVar("floatingCombatTextCombatDamage_v2", 1)
+	SetCVar("floatingCombatTextCombatLogPeriodicSpells_v2", 1)
+	SetCVar("floatingCombatTextPetMeleeDamage_v2", 1)
+	SetCVar("floatingCombatTextPetSpellDamage_v2", 1)
+
+	if (not Client.hasModernAPI and CombatText_UpdateDisplayedMessages) then
+		CombatText_UpdateDisplayedMessages()
+	end
+
+	module.ApplyContextOptions()
+end
+
+local function ApplyContextOptions()
+	GetRuntimeController():Apply()
+end
+
+local function SetOptionUserDisabled(isDisabled)
+	savedVariables.userDisabled = isDisabled or nil
+	ApplyContextOptions()
+end
+
 local function IsModDisabled()
 	return savedVariables and savedVariables.userDisabled
 end
 
-
--- ****************************************************************************
--- Updates the class colors in the master profile with the colors defined in
--- the CUSTOM_CLASS_COLORS table.
--- ****************************************************************************
 local function UpdateCustomClassColors()
 	for class, colors in pairs(CUSTOM_CLASS_COLORS) do
 		if (masterProfile[class]) then
@@ -3331,17 +2822,12 @@ local function UpdateCustomClassColors()
 	end
 end
 
--- ****************************************************************************
--- Searches through current profile for all used fonts and uses the animation
--- module to preload each font so they're available for use.
--- ****************************************************************************
 local function LoadUsedFonts()
-		-- Add the normal and crit master font.
+
 		local usedFonts = {}
 		if currentProfile.normalFontName then usedFonts[currentProfile.normalFontName] = true end
 		if currentProfile.critFontName then usedFonts[currentProfile.critFontName] = true end
 
-		-- Add any unique fonts used in the scroll areas.
 		if currentProfile.scrollAreas then
 			for saKey, saSettings in pairs(currentProfile.scrollAreas) do
 				if saSettings.normalFontName then usedFonts[saSettings.normalFontName] = true end
@@ -3349,14 +2835,12 @@ local function LoadUsedFonts()
 			end
 		end
 
-		-- Add any unique fonts used in the events.
 		if currentProfile.events then
 			for eventName, eventSettings in pairs(currentProfile.events) do
 				if eventSettings.fontName then usedFonts[eventSettings.fontName] = true end
 			end
 		end
 
-		-- Add any unique fonts used in the triggers.
 		if currentProfile.triggers then
 			for triggerName, triggerSettings in pairs(currentProfile.triggers) do
 				if type(triggerSettings) == "table" then
@@ -3365,27 +2849,15 @@ local function LoadUsedFonts()
 			end
 		end
 
-		-- Let the animation system preload the fonts.
 		for fontName in pairs(usedFonts) do MikSBT.Animations.LoadFont(fontName) end
 end
 
+local function UpdateProfiles(profiles)
 
+	for profileName, profile in pairs(profiles) do
 
-
--------------------------------------------------------------------------------
--- Profile functions.
--------------------------------------------------------------------------------
-
--- ****************************************************************************
--- Updates profiles created with older versions.
--- ****************************************************************************
-local function UpdateProfiles()
-	-- Loop through all the profiles.
-	for profileName, profile in pairs(savedVariables.profiles) do
-		-- Get numeric creation version.
 		local creationVersion = tonumber(select(3, string_find(tostring(profile.creationVersion), "(%d+%.%d+)")))
 
-		-- Delete triggers if upgrading from a version prior to 5.2.
 		if (creationVersion < 5.2) then
 			profile.triggers = nil
 			profile.creationVersion = MikSBT.VERSION .. "." .. MikSBT.SVN_REVISION
@@ -3393,323 +2865,225 @@ local function UpdateProfiles()
 	end
 end
 
-
--- ****************************************************************************
--- Selects the passed profile.
--- ****************************************************************************
 local function SelectProfile(profileName)
-	-- Make sure the profile exists.
+
 	if (savedVariables.profiles[profileName]) then
-		-- Set the current profile name for the character to the one being selected.
+
 		savedVariablesPerChar.currentProfileName = profileName
 
-		-- Set the current profile pointer.
 		currentProfile = savedVariables.profiles[profileName]
 		module.currentProfile = currentProfile
 
-		-- Clear the differential table map.
 		EraseTable(differentialMap)
 
-		-- Associate the current profile tables with the corresponding master profile entries.
 		AssociateDifferentialTables(currentProfile, masterProfile)
 
-		-- Load the fonts used by the profile now so they are available by the time
-		-- the first text is shown.
 		LoadUsedFonts()
 
-		-- Update the scroll areas and triggers with the current profile settings.
 		MikSBT.Animations.UpdateScrollAreas()
 		MikSBT.Triggers.UpdateTriggers()
+		if savedVariables then
+			ApplyContextOptions()
+		end
 	end
 end
 
-
--- ****************************************************************************
--- Copies the passed profile to a new profile with the passed name.
--- ****************************************************************************
 local function CopyProfile(srcProfileName, destProfileName)
-	-- Leave the function if the the destination profile name is invalid.
+
 	if (not destProfileName or destProfileName == "") then return end
 
-	-- Make sure the source profile exists and the destination profile doesn't.
 	if (savedVariables.profiles[srcProfileName] and not savedVariables.profiles[destProfileName]) then
-		-- Copy the profile.
+
 		savedVariables.profiles[destProfileName] = CopyTable(savedVariables.profiles[srcProfileName])
 	end
 end
 
-
--- ****************************************************************************
--- Deletes the passed profile.
--- ****************************************************************************
 local function DeleteProfile(profileName)
-	-- Ignore the delete if the passed profile is the default one.
+
 	if (profileName == DEFAULT_PROFILE_NAME) then return end
 
-	-- Make sure the profile exists.
 	if (savedVariables.profiles[profileName]) then
-		-- Check if the profile being deleted is the current one.
+
 		if (profileName == savedVariablesPerChar.currentProfileName) then
-			-- Select the default profile.
+
 			SelectProfile(DEFAULT_PROFILE_NAME)
 		end
 
-		-- Delete the profile.
 		savedVariables.profiles[profileName] = nil
 	end
 end
 
-
--- ****************************************************************************
--- Resets the passed profile to its defaults.
--- ****************************************************************************
 local function ResetProfile(profileName, showOutput)
-	-- Set the profile name to the current profile is one wasn't passed.
+
 	if (not profileName) then profileName = savedVariablesPerChar.currentProfileName end
 
-	-- Make sure the profile exists.
 	if (savedVariables.profiles[profileName]) then
-		-- Reset the profile.
+
 		EraseTable(savedVariables.profiles[profileName])
 
-		-- Reset the profile's creation version.
 		savedVariables.profiles[profileName].creationVersion = MikSBT.VERSION .. "." .. MikSBT.SVN_REVISION
 
-
-		-- Check if it's the current profile being reset.
 		if (profileName == savedVariablesPerChar.currentProfileName) then
-			-- Reselect the profile to update everything.
+
 			SelectProfile(profileName)
 		end
 
-		-- Check if the output text is to be shown.
 		if (showOutput) then
-			-- Print the profile reset string.
+
 			Print(profileName .. " " .. L.MSG_PROFILE_RESET, 0, 1, 0)
 		end
 	end
 end
 
+local function GetProfileTransfer()
+	return MikSBT.Configuration.ProfileTransfer:New({
+		masterProfile = masterProfile,
+		version = MikSBT.VERSION .. "." .. MikSBT.SVN_REVISION,
+		client = Client.interfaceVersion,
+		locale = GetLocale(),
+	})
+end
 
--- ****************************************************************************
--- This function initializes the saved variables.
--- ****************************************************************************
+local function ExportProfile(profileName)
+	local profile = savedVariables.profiles[profileName]
+	if not profile then return nil, "INVALID_NAME" end
+	return GetProfileTransfer():Export(profileName, profile, {
+		fonts = MikSBT.Media.fonts,
+		sounds = MikSBT.Media.sounds,
+	})
+end
+
+local function ImportProfile(text, profileName)
+	if InCombatLockdown() then return nil, "IN_COMBAT" end
+	local name, details = GetProfileTransfer():Import(
+		text, profileName, savedVariables.profiles, savedMedia)
+	if not name then return nil, details end
+	MikSBT.Media.OnVariablesInitialized()
+	SelectProfile(name)
+	return name, details
+end
+
 local function InitSavedVariables()
-	-- Set the saved variables per character to the value specified in the .toc file.
-	savedVariablesPerChar = _G[SAVED_VARS_PER_CHAR_NAME]
+	local store = MikSBT.Configuration.ProfileStore:New({
+		globals = _G,
+		version = MikSBT.VERSION .. "." .. MikSBT.SVN_REVISION,
+		defaultProfileName = DEFAULT_PROFILE_NAME,
+		migrateProfiles = function(profiles)
+			UpdateProfiles(profiles)
+		end,
+	})
+	local state = store:Initialize()
 
-	-- Check if there are no saved variables per character.
-	if (not savedVariablesPerChar) then
-		-- Create a new table to hold the saved variables per character, and set the .toc entry to it.
-		savedVariablesPerChar = {}
-		_G[SAVED_VARS_PER_CHAR_NAME] = savedVariablesPerChar
+	savedVariables = state.savedVariables
+	savedVariablesPerChar = state.savedVariablesPerChar
+	savedMedia = state.savedMedia
+	isFirstLoad = state.isFirstLoad
 
-		-- Set the current profile for the character to the default profile.
-		savedVariablesPerChar.currentProfileName = DEFAULT_PROFILE_NAME
-	end
+	SelectProfile(state.currentProfileName)
 
-
-	-- Set the saved variables to the value specified in the .toc file.
-	savedVariables = _G[SAVED_VARS_NAME]
-
-	-- Check if there are no saved variables.
-	if (not savedVariables) then
-		-- Create a new table to hold the saved variables, and set the .toc entry to it.
-		savedVariables = {}
-		_G[SAVED_VARS_NAME] = savedVariables
-
-		-- Create the profiles table and default profile.
-		savedVariablesPerChar.currentProfileName = DEFAULT_PROFILE_NAME
-		savedVariables.profiles = {}
-		savedVariables.profiles[DEFAULT_PROFILE_NAME] = {}
-
-		savedVariables.profiles[DEFAULT_PROFILE_NAME].creationVersion = MikSBT.VERSION .. "." .. MikSBT.SVN_REVISION
-
-		-- Set the first time loaded flag.
-		isFirstLoad = true
-
-	-- There are saved variables.
-	else
-		-- Updates profiles created by older versions.
-		UpdateProfiles()
-	end
-
-	-- Select the current profile for the character if it exists, otherwise select the default profile.
-	if (savedVariables.profiles[savedVariablesPerChar.currentProfileName]) then
-		SelectProfile(savedVariablesPerChar.currentProfileName)
-	else
-		SelectProfile(DEFAULT_PROFILE_NAME)
-	end
-
-
-	-- Set the saved media to the value specified in the .toc file.
-	savedMedia = _G[SAVED_MEDIA_NAME]
-
-	-- Check if there is no saved media.
-	if (not savedMedia) then
-		-- Create a new table to hold the saved media, and set the .toc entry to it.
-		savedMedia = {}
-		_G[SAVED_MEDIA_NAME] = savedMedia
-
-		-- Create custom font and sounds tables.
-		savedMedia.fonts = {}
-		savedMedia.sounds = {}
-	end
-
-	-- Allow public access to saved variables.
 	module.savedVariables = savedVariables
 	module.savedMedia = savedMedia
 end
 
-
--------------------------------------------------------------------------------
--- Command handler functions.
--------------------------------------------------------------------------------
-
--- ****************************************************************************
--- Returns the current and remaining parameters from the passed string.
--- ****************************************************************************
 local function GetNextParameter(paramString)
 	local remainingParams
 	local currentParam = paramString
 
-	-- Look for a space.
 	local index = string_find(paramString, " ", 1, true)
 	if (index) then
-		-- Get the current and remaing parameters.
+
 		currentParam = string.sub(paramString, 1, index-1)
 		remainingParams = string.sub(paramString, index+1)
 	end
 
-	-- Return the current parameter and the remaining ones.
 	return currentParam, remainingParams
 end
 
-
--- ****************************************************************************
--- Called to handle commands.
--- ****************************************************************************
 local function CommandHandler(params)
-	-- Get the parameter.
+
 	local currentParam, remainingParams
 	currentParam, remainingParams = GetNextParameter(params)
 
-	-- Flag for whether or not to show usage info.
 	local showUsage = true
 
-	-- Make sure there is a current parameter and lower case it.
 	if (currentParam) then currentParam = string.lower(currentParam) end
 
-	-- Look for the recognized parameters.
 	if (currentParam == "") then
-		-- Load the on demand options.
+
 		ShowOptions()
 
-		-- Don't show the usage info.
 		showUsage = false
 
-		-- Reset.
 		elseif (currentParam == L.COMMAND_RESET) then
-		-- Reset the current profile.
+
 		ResetProfile(nil, true)
 
-		-- Don't show the usage info.
 		showUsage = false
 
-	-- Disable.
 	elseif (currentParam == L.COMMAND_DISABLE) then
-		-- Set the user disabled option.
+
 		SetOptionUserDisabled(true)
 
-		-- Output an informative message.
 		Print(L.MSG_DISABLE, 1, 1, 1)
 
-		-- Don't show the usage info.
 		showUsage = false
 
-	-- Enable.
 	elseif (currentParam == L.COMMAND_ENABLE) then
-		-- Unset the user disabled option.
+
 		SetOptionUserDisabled(false)
 
-		-- Output an informative message.
 		Print(L.MSG_ENABLE, 1, 1, 1)
 
-		-- Don't show the usage info.
 		showUsage = false
 
-	-- Version.
 	elseif (currentParam == L.COMMAND_SHOWVER) then
-		-- Output the current version number.
+
 		Print(MikSBT.VERSION_STRING, 1, 1, 1)
 
-		-- Don't show the usage info.
 		showUsage = false
 
 	end
 
-	-- Check if the usage information should be shown.
 	if (showUsage) then
-		-- Loop through all of the entries in the command usage list.
+
 		for _, msg in ipairs(L.COMMAND_USAGE) do
 			Print(msg, 1, 1, 1)
 		end
-	end -- Show usage.
+	end
 end
 
-
--------------------------------------------------------------------------------
--- Event handlers.
--------------------------------------------------------------------------------
-
--- ****************************************************************************
--- Called when the registered events occur.
--- ****************************************************************************
 local function OnEvent(this, event, arg1)
-	-- When an addon is loaded.
 	if (event == "ADDON_LOADED") then
-		-- Ignore the event if it isn't this addon.
+
 		if (arg1 ~= "MikScrollingBattleText") then return end
 
-		-- Don't get notification for other addons being loaded.
 		this:UnregisterEvent("ADDON_LOADED")
 
-		-- Register slash commands
 		SLASH_MSBT1 = MikSBT.COMMAND
 		SlashCmdList["MSBT"] = CommandHandler
 
-		-- Initialize the saved variables to make sure there is a profile to work with.
 		InitSavedVariables()
 
-		-- Add a button to launch MSBT's options from the Blizzard interface options.
 		SetupBlizzardOptions()
 
-		-- Let the media module know the variables are initialized.
 		MikSBT.Media.OnVariablesInitialized()
 
-	-- Variables for all addons loaded.
 	elseif (event == "VARIABLES_LOADED") then
-		-- Disable or enable the mod depending on the saved setting.
 		SetOptionUserDisabled(IsModDisabled())
 
-		-- Disable Blizzard's combat text if it's the first load.
 		if (isFirstLoad) then DisableBlizzardCombatText() end
+		ApplyBlizzardCombatTextOptions()
 
-		-- Support CUSTOM_CLASS_COLORS.
 		if (CUSTOM_CLASS_COLORS) then
 			UpdateCustomClassColors()
 			if (CUSTOM_CLASS_COLORS.RegisterCallback) then CUSTOM_CLASS_COLORS:RegisterCallback(UpdateCustomClassColors) end
 		end
 		collectgarbage("collect")
+	elseif event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_REGEN_DISABLED" or event == "GROUP_ROSTER_UPDATE" then
+		ApplyContextOptions()
 	end
 end
 
-
--------------------------------------------------------------------------------
--- Initialization.
--------------------------------------------------------------------------------
-
--- Create a frame to receive events.
 eventFrame = CreateFrame("Frame", "MSBTProfileFrame", UIParent)
 eventFrame:SetPoint("BOTTOM")
 eventFrame:SetWidth(0.0001)
@@ -3717,25 +3091,24 @@ eventFrame:SetHeight(0.0001)
 eventFrame:Hide()
 eventFrame:SetScript("OnEvent", OnEvent)
 
--- Register events for when the mod is loaded and variables are loaded.
 eventFrame:RegisterEvent("ADDON_LOADED")
 eventFrame:RegisterEvent("VARIABLES_LOADED")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 
-
-
-
--------------------------------------------------------------------------------
--- Module interface.
--------------------------------------------------------------------------------
-
--- Protected Variables.
 module.masterProfile = masterProfile
 
--- Protected Functions.
 module.CopyProfile					= CopyProfile
 module.DeleteProfile				= DeleteProfile
 module.ResetProfile					= ResetProfile
 module.SelectProfile				= SelectProfile
+module.ExportProfile				= ExportProfile
+module.ImportProfile				= ImportProfile
 module.SetOption					= SetOption
 module.SetOptionUserDisabled		= SetOptionUserDisabled
 module.IsModDisabled				= IsModDisabled
+module.ApplyContextOptions			= ApplyContextOptions
+module.ResetOfficialBlizzardCombatText = ResetOfficialBlizzardCombatText
+

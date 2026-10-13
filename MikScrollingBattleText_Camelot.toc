@@ -1,0 +1,56 @@
+## Interface: 16001
+## Version: 12.030
+## Title: Mik's Scrolling Battle Text
+## Author: Mikord
+## Notes: Scrolls battle information around the character model.
+## SavedVariables: MSBTProfiles_SavedVars, MSBT_SavedMedia
+## SavedVariablesPerCharacter: MSBTProfiles_SavedVarsPerChar
+## OptionalDeps: LibSharedMedia-3.0
+
+Libs\LibStub.lua
+Libs\LibSerialize.lua
+Libs\LibDeflate.lua
+Libs\CallbackHandler-1.0.lua
+Libs\LibSharedMedia-3.0.lua
+
+MikSBT.lua
+Compatibility\Client.lua
+Configuration\ProfileStore.lua
+Configuration\MediaRegistry.lua
+Configuration\RuntimeController.lua
+Configuration\ProfileTransfer.lua
+API\RestrictedValue.lua
+API\Sounds.lua
+API\Spells.lua
+API\Units.lua
+API\Cooldowns.lua
+Compatibility\LegacyAPI.lua
+Services\Formatter.lua
+Services\EventRouter.lua
+Components\IncomingCombat.lua
+Components\OutgoingBatcher.lua
+Components\DamageMeterSource.lua
+Components\OutgoingCombat.lua
+Components\ParserNotifications.lua
+Components\UtilityNotifications.lua
+Components\ItemCooldownTracker.lua
+Display\ScrollAreas.lua
+Display\DisplayService.lua
+Localization\localization.xml
+MSBTProfiles.lua
+MSBTParser.lua
+MSBTMedia.lua
+Display\AnimationEngine.lua
+MSBTTriggers.lua
+MSBTCooldowns.lua
+Components\LootNotifications.lua
+MSBTMain.lua
+Display\AnimationStyles.lua
+
+MSBTOptions\Localization\localization.xml
+MSBTOptions\MSBTOptionsControls.lua
+MSBTOptions\MSBTOptionsPopups.lua
+MSBTOptions\MSBTOptionsMain.lua
+MSBTOptions\MSBTOptionsSounds.lua
+MSBTOptions\MSBTOptionsProfileTransfer.lua
+MSBTOptions\MSBTOptionsTabs.lua

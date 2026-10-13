@@ -1,0 +1,385 @@
+
+if (GetLocale() ~= "frFR") then return end
+
+local L = MikSBT.translations
+
+
+
+L.MSG_NEW_PROFILE					= "Nouveau Profil"
+L.MSG_PROFILE_ALREADY_EXISTS		= "Le Profil existe déjà."
+L.MSG_INVALID_PROFILE_NAME			= "Nom de profil invalide."
+L.MSG_NEW_SCROLL_AREA				= "Nouveau zone de défilement"
+L.MSG_SCROLL_AREA_ALREADY_EXISTS	= "Une zone de défilement portant ce nom existe déjà."
+L.MSG_INVALID_SCROLL_AREA_NAME		= "Nom de zone de défilement invalide."
+L.MSG_ACKNOWLEDGE_TEXT				= "Etes-vous certain de vouloir effectuer cette action?"
+L.MSG_NORMAL_PREVIEW_TEXT			= "Normal"
+L.MSG_DISPLAY_QUALITY				= "Afficher une alerte pour les items de cette qualité."
+L.MSG_ITEM_QUALITIES				= "Qualité des Items"
+L.MSG_ITEMS							= "Items"
+L.MSG_ITEM_ALREADY_EXISTS			= "Le nom de l'item existe déjà."
+L.MSG_INVALID_ITEM_NAME				= "Nom de l'item incorrect."
+
+
+
+obj = L.TABS
+obj["general"]		= { label="Général", tooltip="Affiche les options générales."}
+obj["scrollAreas"]	= { label="Zones de défilement", tooltip="Affiche les options de création, suppression et configuration des zones de défilement.\n\nPassez votre souris sur les icônes pour plus d'informations."}
+obj["events"]		= { label="Evènements", tooltip="Affiche les options pour les évènements entrants, sortants et de notification.\n\nPassez votre souris sur les icônes pour plus d'informations."}
+obj["lootAlerts"]	= { label="Alertes Loot", tooltip="Affiche les options des notifications relatives au items ramassés."}
+
+
+
+obj = L.CHECKBOXES
+obj["enableMSBT"]			= { label="Activer Mik's Scrolling Battle Text", tooltip="Activer MSBT."}
+obj["disableMSBTInGroup"]	= { label="Desactiver MSBT en groupe", tooltip="Desactive automatiquement MSBT en groupe ou en raid."}
+obj["enableBlizzardV2CombatText"]= { label="Activer le texte de combat Blizzard", tooltip="Active le texte de combat flottant Blizzard (v2) pour joueur et familier." }
+obj["enableBlizzardV2InGroup"]= { label="Texte Blizzard en groupe", tooltip="Active le texte de combat Blizzard uniquement en groupe ou en raid." }
+obj["stickyCrits"]			= { label="Critiques persistants", tooltip="Utiliser le style persistant pour les coups critiques."}
+obj["colorPartialEffects"]	= { label="Colorer les effets partiels", tooltip="Assigner des couleurs aux effets partiels."}
+obj["crushing"]				= { label="Ecrasements", tooltip="Afficher les écrasements."}
+obj["glancing"]				= { label="Eraflures", tooltip="Afficher les éraflures."}
+obj["absorb"]				= { label="Absorptions partielles", tooltip="Afficher la valeur des absorptions partielles."}
+obj["block"]				= { label="Bloquages partiels", tooltip="Afficher la valeur des bloquages partiels."}
+obj["resist"]				= { label="Résistances partielles", tooltip="Afficher la valeur des résistances partielles."}
+obj["vulnerability"]		= { label="Bonus de vulnérabilité", tooltip="Afficher la valeur des bonus de vulnérabilité."}
+obj["overheal"]				= { label="Soins en excès", tooltip="Afficher la valeur des soins en excès."}
+obj["overkill"]				= { label="Dommages en excès", tooltip="Afficher la valeur des dommages en excès."}
+obj["colorDamageAmounts"]	= { label="Valeurs des dommages en couleur", tooltip="Utiliser des couleurs pour la valeur des dommages."}
+obj["colorDamageEntry"]		= { tooltip="Activer la couleur pour ce type de dommage."}
+obj["colorUnitNames"]		= { label="Colorer les Noms des Unités", tooltip="Aplliquer les couleurs de classe spécifiques aux noms des unités."}
+obj["colorClassEntry"]		= { tooltip="Activer la couleur pour cette classe."}
+obj["enableScrollArea"]		= { tooltip="Activer la zone de défilement."}
+obj["inheritField"]			= { label="Hérité", tooltip="Hériter de la valeur par défaut. Désélectionner pour modifier cette valeur."}
+obj["hideSkillIcons"]		= { label="Cacher les Icônes", tooltip="Ne pas montrer les icônes dans cette zone."}
+obj["stickyEvent"]			= { label="Toujours Persistant", tooltip="Utiliser le style persistant pour l'évènement."}
+obj["enableTrigger"]		= { tooltip="Activer le déclencheur."}
+obj["allPowerGains"]		= { label="Tous les gains d'énergie", tooltip="Affiche tous les gains d'énergie même ceux qui ne sont pas affichés dans le journal ce combat.\n\nATTENTION: Cette option est source de spam et ignorera les réglages de seuil de spam et de son contrôle.\n\nNON RECOMMANDE."}
+obj["abbreviateSkills"]		= { label="Compétences Abrégées", tooltip="Nom des compétences abrégées (client anglais seulement).\n\nCela peut être contourné pour chaque évènement en utilisant le code %sl."}
+obj["hideSkills"]			= { label="Cacher les Noms des Compétences", tooltip="Ne pas afficher les noms de compétences pour les évènements entrants et sortants.\n\nVous abandonnerez quelques possibilités de personnalisation de l'évènement si vous utilisez cette option car le code %s sera ignoré."}
+obj["hideNames"]			= { label="Cacher les Noms des Unités", tooltip="Ne pas afficher les noms des unités pour les évènements entrants et sortants.\n\nVous abandonnerez quelques possibilités de personnalisation de l'évènement si vous utilisez cette option car le code %n sera ignoré."}
+obj["hideFullOverheals"]	= { label="Cacher les Soins en Excès Total", tooltip="Ne pas afficher les soins qui ont un soin effectif égal à zéro."}
+obj["lootedItems"]			= { label="Items Ramassés", tooltip="Affiche les notifications quand des items sont ramassés."}
+obj["moneyGains"]			= { label="Gains d'argent", tooltip="Affiche vos gains d'argent."}
+obj["alwaysShowQuestItems"]	= { label="Toujours Montrer les Items de Quête", tooltip="Toujours montrer les items de quête quelle que soit la sélection selon la qualité des items."}
+obj["enableIcons"]			= { label="Activer les Icônes de Compétence", tooltip="Affiche les icônes des compétences pour les évènements quand c'est possible."}
+
+
+
+obj = L.DROPDOWNS
+obj["profile"]				= { label="Profil actuel:", tooltip="Assigne le profil actif."}
+obj["normalFont"]			= { label="Police normale:", tooltip="Assigne la police de caractères utilisée pour les coups non critiques."}
+obj["critFont"]				= { label="Police critique:", tooltip="Assigne la police de caractères utilisée pour les coups critiques."}
+obj["normalOutline"]		= { label="Contour normal:", tooltip="Assigne le contour utilisé pour les coups non critiques."}
+obj["critOutline"]			= { label="Contour critique:", tooltip="Assigne le contour utilisé pour les coups critiques."}
+obj["scrollArea"]			= { label="Zone de défilement:", tooltip="Sélectionne la zone de défilement à configurer."}
+obj["animationStyle"]		= { label="Animation normale:", tooltip="Style d'animation pour l'animation non persistante dans la zone de défilement."}
+obj["stickyAnimationStyle"]	= { label="Animations persistante:", tooltip="Style d'animation pour l'animation persistante dans la zone de défilement."}
+obj["direction"]			= { label="Direction:", tooltip="La direction de l'animation."}
+obj["behavior"]				= { label="Comportement:", tooltip="Le comportement de l'animation."}
+obj["textAlign"]			= { label="Alignement du texte:", tooltip="Alignement du texte pour l'animation."}
+obj["iconAlign"]			= { label="Alignement de l'icône:", tooltip="L'alignement des icônes de compétence par rapport au texte."}
+obj["eventCategory"]		= { label="Catégorie d'évènement:", tooltip="La catégorie de l'évènement à configurer."}
+obj["outputScrollArea"]		= { label="Zone de défilement de sortie:", tooltip="Sélectionne la zone de défilement à utiliser."}
+
+
+
+obj = L.BUTTONS
+obj["copyProfile"]				= { label="Copier", tooltip="Copie le profil sous un nouveau nom."}
+obj["resetProfile"]				= { label="Réinitialiser", tooltip="Réinitialise le profil avec les paramètres par défaut."}
+obj["deleteProfile"]			= { label="Supprimer", tooltip="Supprime le profil."}
+obj["masterFont"]				= { label="Police principale", tooltip="Paramètres des polices principales, hérités par les zones de défilement et les évènements associées avec elles, à moins qu'ils ne soient dépassés par les réglages individuels."}
+obj["partialEffects"]			= { label="Effets partiels", tooltip="Détermine les effets partiels affichés et les paramètres de couleurs."}
+obj["damageColors"]				= { label="Couleurs des Dommages", tooltip="Vous permet de paramétrer les couleurs assignées aux valeurs des dommages suivant leur type."}
+obj["classColors"]				= { label="Couleurs des Classes", tooltip="Vous permet de définir si les noms d'unités sont colorées ou non selon leur classe et quelle couleur utiliser pour chaque classe." }
+obj["inputOkay"]				= { label="OK", tooltip="Accepte la saisie."}
+obj["inputCancel"]				= { label="Annuler", tooltip="Annule la saisie."}
+obj["genericSave"]				= { label="Enregistrer", tooltip="Enregistre les modifications."}
+obj["genericCancel"]			= { label="Annuler", tooltip="Annule les modifications."}
+obj["addScrollArea"]			= { label="Ajouter une zone", tooltip="Ajoute une zone de défilement à laquelle des déclencheurs et évènements peuvent être assignés."}
+obj["configScrollAreas"]		= { label="Configurer les zones", tooltip="Permet de configurer les styles d'animation normales et persistantes, l'alignement du texte, la largeur/hauteur de la zone de défilement et leur emplacement."}
+obj["editScrollAreaName"]		= { tooltip="Cliquer pour modifier le nom de la zone de défilement."}
+obj["scrollAreaFontSettings"]	= { tooltip="Cliquer pour modifier les paramètres de police pour la zone de défilement. Ces paramètres seront utilisés par tous les évènements de cette zone à moins qu'ils ne soient dépassés par les réglages individuels."}
+obj["deleteScrollArea"]			= { tooltip="Cliquer pour supprimer la zone de défilement."}
+obj["scrollAreasPreview"]		= { label="Aperçu", tooltip="Prévisualiser les modifications."}
+obj["toggleAll"]				= { label="Changer Tout", tooltip="Modifie l'état des évènements dans la catégorie sélectionnée."}
+obj["moveAll"]					= { label="Déplacer Tout", tooltip="Déplace tous les évènements dans la catégorie sélectionnée vers la zone de défilement spécifiée."}
+obj["eventFontSettings"]		= { tooltip="Cliquer pour éditer les paramètres de police de l'évènement."}
+obj["eventSettings"]			= { tooltip="Cliquer pour éditer les paramètres de l'évènement comme la zone de défilement, message, sonore, etc."}
+obj["itemsAllowed"]				= { label="Items Autorisés", tooltip="Toujours montrer les items spécifiés quelle que soit leur qualité."}
+obj["itemExclusions"]			= { label="Item Interdit", tooltip="Empêche d'afficher les items spécifiés."}
+obj["addItem"]					= { label="Ajouter un Item", tooltip="Ajoute un nouvel item à la liste."}
+obj["deleteItem"]				= { tooltip="Cliquer pour supprimer l'item."}
+
+
+
+obj = L.EDITBOXES
+obj["copyProfile"]		= { label="Nom du nouveau profil:", tooltip="Nom du nouveau profil vers lequel copier le profil courant."}
+obj["scrollAreaName"]	= { label="Nouveau nom pour la zone de défilement:", tooltip="Nouveau nom pour la zone de défilement."}
+obj["xOffset"]			= { label="Décalage X:", tooltip="Le décalage horizontal de la zone de défilement."}
+obj["yOffset"]			= { label="Décalage Y:", tooltip="Le décalage vertical de la zone de défilement."}
+obj["eventMessage"]		= { label="Message affiché:", tooltip="Le message affiché quand l'évènement intervient."}
+obj["iconSkill"]		= { label="Icône de la compétence:", tooltip="Le nom ou le numéro d'ID d'une compétence dont l'icône sera affichée quand l'évènement survient.\n\nMSBT essayera automatiquement d'afficher une icône appropriée si aucune n'est spécifiée.\n\nNOTE: une numéro d'ID doit être utilisé à la place du nom si la compétence n'est pas dans le livre de sort de la classe jouée quand l'évènement survient. La plupart des bases de données en ligne comme wowhead permettent de rechercher cette ID."}
+obj["itemName"]			= { label="Nom de l'item:", tooltip="Le nom de l'item à ajouter."}
+
+
+
+obj = L.SLIDERS
+obj["animationSpeed"]		= { label="Vitesse d'animation", tooltip="Définit la vitesse maître de l'animation.\n\nChaque zone de défilement peut être configurée pour avoir sa propre vitesse d'animation."}
+obj["normalFontSize"]		= { label="Taille normale", tooltip="Définit la taille de la police pour les coups non critiques."}
+obj["normalFontOpacity"]	= { label="Opacité normale", tooltip="Définit l'opacité de la police pour les coups non critiques."}
+obj["critFontSize"]			= { label="Taille critique", tooltip="Définit la taille de la police pour les coups critiques."}
+obj["critFontOpacity"]		= { label="Opacité critique", tooltip="Définit l'opacité de la police pour les coups critiques."}
+obj["scrollHeight"]			= { label="Hauteur de défilement", tooltip="La hauteur de la zone de défilement."}
+obj["scrollWidth"]			= { label="Largeur de défilement", tooltip="La largeur de la zone de défilement."}
+obj["scrollAnimationSpeed"]	= { label="Vitesse d'animation", tooltip="La vitesse de l'animation pour la zone de défilement."}
+obj["powerThreshold"]		= { label="Seuil de l'énergie", tooltip="Le seuil que les gains d'énergie doivent dépasser pour être affichés."}
+obj["healThreshold"]		= { label="Seuil des soins", tooltip="Le seuil que les soins doivent dépasser pour être affichés."}
+obj["damageThreshold"]		= { label="Seuil des dommages", tooltip="Le seuil que les dommages doivent dépasser pour être affichés."}
+obj["dotThrottleTime"]		= { label="Temps de spam des DoT", tooltip="Le nombre de secondes à prendre en compte pour afficher les DoT."}
+obj["hotThrottleTime"]		= { label="Temps de spam des HoT", tooltip="Le nombre de secondes à prendre en compte pour afficher les HoT."}
+obj["powerThrottleTime"]	= { label="Temps de spam des Gains", tooltip="Le nombre de secondes à prendre en compte pour afficher les gains de puissance."}
+
+
+obj = L.EVENT_CATEGORIES
+obj[1] = "Entrant player"
+obj[2] = "Entrant familier"
+obj[3] = "Sortant player"
+obj[4] = "Sortant familier"
+obj[5] = "Alertes"
+
+
+
+obj = L.EVENT_CODES
+obj["DAMAGE_TAKEN"]			= "%a - Quantité de dommages.\n"
+obj["HEALING_TAKEN"]		= "%a - Quantité de soins reçus.\n"
+obj["DAMAGE_DONE"]			= "%a - Dommages infligés.\n"
+obj["HEALING_DONE"]			= "%a - Quantité de soins.\n"
+obj["ABSORBED_AMOUNT"]		= "%a - Quantité de dommages absorbés.\n"
+obj["AURA_AMOUNT"]			= "%a - Nombre de la pile pour cet aura.\n"
+obj["ENERGY_AMOUNT"]		= "%a - Quantité de pouvoir.\n"
+obj["CP_AMOUNT"]			= "%a - Nombre de points de combo.\n"
+obj["HOLY_POWER_AMOUNT"]	= "%a - Amount of holy power you have.\n"
+obj["HONOR_AMOUNT"]			= "%a - Quantité d'honneur.\n"
+obj["REP_AMOUNT"]			= "%a - Quantité de réputation.\n"
+obj["ITEM_AMOUNT"]			= "%a - Quantité de l'item ramassé.\n"
+obj["SKILL_AMOUNT"]			= "%a - Nouveau niveau dans la compétence.\n"
+obj["EXPERIENCE_AMOUNT"]	= "%a - Quantité d'expérience.\n"
+obj["PARTIAL_AMOUNT"]		= "%a - Quantité de l'effet partiel.\n"
+obj["ATTACKER_NAME"]		= "%n - Nom de l'attaquant.\n"
+obj["HEALER_NAME"]			= "%n - Nom du soigneur.\n"
+obj["ATTACKED_NAME"]		= "%n - Nom de l'unité attaquée.\n"
+obj["HEALED_NAME"]			= "%n - Nom de l'unité soignée.\n"
+obj["BUFFED_NAME"]			= "%n - Nom de l'unité.\n"
+obj["UNIT_KILLED"]			= "%n - Nom de l'unité tuée.\n"
+obj["SKILL_NAME"]			= "%s - Nom de la compétence.\n"
+obj["SPELL_NAME"]			= "%s - Nom du sort.\n"
+obj["DEBUFF_NAME"]			= "%s - Nom du debuff.\n"
+obj["BUFF_NAME"]			= "%s - Nom du buff.\n"
+obj["ITEM_BUFF_NAME"]		= "%s - Nom du buff d'objet.\n"
+obj["EXTRA_ATTACKS"]		= "%s - Attaque supplémentaire.\n"
+obj["SKILL_LONG"]			= "%sl - Forme longue de %s. Utilisé pour outrepasser l'abrévation pour cet évènement.\n"
+obj["DAMAGE_TYPE_TAKEN"]	= "%t - Type de dommages.\n"
+obj["DAMAGE_TYPE_DONE"]		= "%t - Type de dommages faits.\n"
+obj["ENVIRONMENTAL_DAMAGE"]	= "%e - Nom de la source de dommages (chute, noyade, lave, etc...)\n"
+obj["FACTION_NAME"]			= "%e - Faction.\n"
+obj["EMOTE_TEXT"]			= "%e - Le texte de l'emote.\n"
+obj["MONEY_TEXT"]			= "%e - Le texte de l'argent gagné.\n"
+obj["ITEM_NAME"]			= "%e - Le nom de l'item ramassé.\n"
+obj["POWER_TYPE"]			= "%p - Type de pouvoir (énergie, rage, mana).\n"
+obj["TOTAL_ITEMS"]			= "%t - Nombre total de l'item ramassé dans l'inventaire."
+
+
+
+obj = L.INCOMING_PLAYER_EVENTS
+obj["INCOMING_DAMAGE"]						= { label="Mêlées", tooltip="Afficher les dommages des attaques de mêlée."}
+obj["INCOMING_DAMAGE_CRIT"]					= { label="Mêlées critiques", tooltip="Afficher les dommages des attaques critiques de mêlée."}
+obj["INCOMING_MISS"]						= { label="Manques de mêlée", tooltip="Afficher les attaques de mêlée manquées."}
+obj["INCOMING_DODGE"]						= { label="Esquives de mêlée", tooltip="Afficher les attaques de mêlée esquivées."}
+obj["INCOMING_PARRY"]						= { label="Parades de mêlée", tooltip="Afficher les attaques de mêlée parées."}
+obj["INCOMING_BLOCK"]						= { label="Blocages de mêlée", tooltip="Afficher les dommages en mêlée bloquées."}
+obj["INCOMING_ABSORB"]						= { label="Absorptions de mêlée", tooltip="Afficher les dommages en mêlée absorbés."}
+obj["INCOMING_IMMUNE"]						= { label="Immunités de mêlée", tooltip="Afficher les attaques de mêlée auxquelles vous êtes immunisé."}
+obj["INCOMING_SPELL_DAMAGE"]				= { label="Compétences", tooltip="Afficher les dommages des compétences."}
+obj["INCOMING_SPELL_DAMAGE_CRIT"]			= { label="Compétences critiques", tooltip="Afficher les dommages des compétences critiques."}
+obj["INCOMING_SPELL_DOT"]					= { label="DoTs des compétences", tooltip="Afficher les dommages des DoT de compétences."}
+obj["INCOMING_SPELL_DOT_CRIT"]				= { label="DoTs des compétences critiques", tooltip="Afficher les dommages critiques entrant des DoT de compétences."}
+obj["INCOMING_SPELL_DAMAGE_SHIELD"]			= { label="Dommages des boucliers", tooltip="Afficher les dommages entrant fait par les boucliers."}
+obj["INCOMING_SPELL_DAMAGE_SHIELD_CRIT"]	= { label="Dommages critiques des boucliers", tooltip="Afficher les dommages critiques entrants fait par les boucliers."}
+obj["INCOMING_SPELL_MISS"]					= { label="Manques des compétences", tooltip="Afficher les compétences qui vous ont manqué."}
+obj["INCOMING_SPELL_DODGE"]					= { label="Esquives des compétences", tooltip="Afficher les compétences que vous avez esquivé."}
+obj["INCOMING_SPELL_PARRY"]					= { label="Parades des compétences", tooltip="Afficher les compétences que vous avez paré."}
+obj["INCOMING_SPELL_BLOCK"]					= { label="Bloquages des compétences", tooltip="Afficher les capacités que vous avez bloqué."}
+obj["INCOMING_SPELL_RESIST"]				= { label="Résistances aux sorts", tooltip="Afficher les sorts auxquels vous avez résisté."}
+obj["INCOMING_SPELL_ABSORB"]				= { label="Absorptions des compétences", tooltip="Afficher les dommages des compétences que vous avez absorbé."}
+obj["INCOMING_SPELL_IMMUNE"]				= { label="Immunités aux compétences", tooltip="Afficher les compétences auxquelles vous êtes immunisé."}
+obj["INCOMING_SPELL_REFLECT"]				= { label="Compétences renvoyés", tooltip="Afficher les compétences que vous avez renvoyé."}
+obj["INCOMING_SPELL_INTERRUPT"]				= { label="Sorts interrompus", tooltip="Afficher les sorts que vous avez interrompu."}
+obj["INCOMING_HEAL"]						= { label="Soins", tooltip="Afficher les soins reçus."}
+obj["INCOMING_HEAL_CRIT"]					= { label="Soins critiques", tooltip="Afficher les soins critiques reçus."}
+obj["INCOMING_HOT"]							= { label="Soins sur le temps (HoT)", tooltip="Afficher les soins des soins sur le temps (HoT) reçus."}
+obj["INCOMING_ENVIRONMENTAL"]				= { label="Dommages de l'environnement", tooltip="Afficher les effets de l'environnement (chutes, noyades, lave, etc...) sur vous."}
+
+obj = L.INCOMING_PET_EVENTS
+obj["PET_INCOMING_DAMAGE"]						= { label="Mêlées", tooltip="Afficher les dommages des attaques de mêlée sur votre familier."}
+obj["PET_INCOMING_DAMAGE_CRIT"]					= { label="Mêlées critiques", tooltip="Afficher les dommages des attaques critiques de mêlée sur votre familier."}
+obj["PET_INCOMING_MISS"]						= { label="Manques de mêlée", tooltip="Afficher les attaques de mêlée manquées sur votre familier."}
+obj["PET_INCOMING_DODGE"]						= { label="Esquives de mêlée", tooltip="Afficher les attaques de mêlée esquivées par votre familier"}
+obj["PET_INCOMING_PARRY"]						= { label="Parades de mêlée", tooltip="Afficher les attaques de mêlée parées par votre familier."}
+obj["PET_INCOMING_BLOCK"]						= { label="Blocages de mêlée", tooltip="Afficher les dommages en mêlée bloquées par votre familier."}
+obj["PET_INCOMING_ABSORB"]						= { label="Absorptions de mêlée", tooltip="Afficher les dommages en mêlée absorbés par votre familier."}
+obj["PET_INCOMING_IMMUNE"]						= { label="Immunités de mêlée", tooltip="Afficher les attaques de mêlée auxquelles votre familier est immunisé."}
+obj["PET_INCOMING_SPELL_DAMAGE"]				= { label="Compétences", tooltip="Afficher les dommages des compétences sur votre familier."}
+obj["PET_INCOMING_SPELL_DAMAGE_CRIT"]			= { label="Compétences critiques", tooltip="Afficher les dommages des compétences critiques sur votre familier."}
+obj["PET_INCOMING_SPELL_DOT"]					= { label="DoTs des compétences", tooltip="Afficher les dommages des DoT de compétences sur votre familier."}
+obj["PET_INCOMING_SPELL_DOT_CRIT"]				= { label="DoTs critiques des compétences", tooltip="Afficher les dommages critiques des DoT de compétences sur votre familier."}
+obj["PET_INCOMING_SPELL_DAMAGE_SHIELD"]			= { label="Dommages des boucliers", tooltip="Afficher les dommages fait par les boucliers à votre familier."}
+obj["PET_INCOMING_SPELL_DAMAGE_SHIELD_CRIT"]	= { label="Dommages critiques des boucliers", tooltip="Afficher les dommages critiques fait par les boucliers à votre familier."}
+obj["PET_INCOMING_SPELL_MISS"]					= { label="Manques des compétences", tooltip="Afficher les compétences qui ont manqué votre familier."}
+obj["PET_INCOMING_SPELL_DODGE"]					= { label="Esquives des compétences", tooltip="Afficher les compétences que votre familier a esquivé."}
+obj["PET_INCOMING_SPELL_PARRY"]					= { label="Parades des compétences", tooltip="Afficher les compétences que votre familier a paré."}
+obj["PET_INCOMING_SPELL_BLOCK"]					= { label="Bloquages des compétences", tooltip="Afficher les capacités que votre familier a bloqué."}
+obj["PET_INCOMING_SPELL_RESIST"]				= { label="Résistances aux sorts", tooltip="Afficher les sorts auxquels votre familier a résisté."}
+obj["PET_INCOMING_SPELL_ABSORB"]				= { label="Absorptions des compétences", tooltip="Afficher les dommages des compétences que votre familier a absorbé."}
+obj["PET_INCOMING_SPELL_IMMUNE"]				= { label="Immunités aux compétences", tooltip="Afficher les compétences auxquelles votre familier est immunisé."}
+obj["PET_INCOMING_HEAL"]						= { label="Soins", tooltip="Afficher les soins reçus par votre familier."}
+obj["PET_INCOMING_HEAL_CRIT"]					= { label="Soins critiques", tooltip="Afficher les soins critiques reçus par votre familier."}
+obj["PET_INCOMING_HOT"]							= { label="Soins sur le temps (HoT)", tooltip="Afficher les soins des soins sur le temps (HoT) reçus par votre familier."}
+
+
+
+obj = L.OUTGOING_PLAYER_EVENTS
+obj["OUTGOING_DAMAGE"]						= { label="Mêlées", tooltip="Afficher les dommages infligés en mêlée."}
+obj["OUTGOING_DAMAGE_CRIT"]					= { label="Mêlées critiques", tooltip="Afficher les dommages critiques infligés en mêlée."}
+obj["OUTGOING_MISS"]						= { label="Manques de mêlée", tooltip="Afficher vos attaques manquées en mêlée."}
+obj["OUTGOING_DODGE"]						= { label="Esquives de mêlée", tooltip="Afficher vos attaques esquivées en mêlée."}
+obj["OUTGOING_PARRY"]						= { label="Parades de mêlée", tooltip="Afficher vos attaques parées en mêlée."}
+obj["OUTGOING_BLOCK"]						= { label="Bloquages de mêlée", tooltip="Afficher vos dommages en mêlée bloquées."}
+obj["OUTGOING_ABSORB"]						= { label="Absorptions de mêlée", tooltip="Afficher vos dommages en mêlée absorbés."}
+obj["OUTGOING_IMMUNE"]						= { label="Immunités de mêlée", tooltip="Afficher vos attaques de mêlée auxquelles l'ennemi est immunisé."}
+obj["OUTGOING_EVADE"]						= { label="Evites de mêlée", tooltip="Afficher vos attaques de mêlée evitées."}
+obj["OUTGOING_SPELL_DAMAGE"]				= { label="Compétences", tooltip="Afficher les dommages de vos compétences."}
+obj["OUTGOING_SPELL_DAMAGE_CRIT"]			= { label="Compétences critiques", tooltip="Afficher les dommages de vos compétences critiques."}
+obj["OUTGOING_SPELL_DOT"]					= { label="DoTs des compétences", tooltip="Afficher les dommages sur le temps (DoT) de vos compétences."}
+obj["OUTGOING_SPELL_DOT_CRIT"]				= { label="DoTs critiques des compétences", tooltip="Afficher les dommages critiques sur le temps (DoT) de vos compétences."}
+obj["OUTGOING_SPELL_DAMAGE_SHIELD"]			= { label="Dommages des boucliers", tooltip="Afficher les dommages fait par vos boucliers."}
+obj["OUTGOING_SPELL_DAMAGE_SHIELD_CRIT"]	= { label="Dommages critiques des boucliers", tooltip="Afficher les dommages critiques fait par vos boucliers."}
+obj["OUTGOING_SPELL_MISS"]					= { label="Manques compétences", tooltip="Afficher les coups manqués de vos compétences."}
+obj["OUTGOING_SPELL_DODGE"]					= { label="Esquives compétences", tooltip="Afficher vos compétences esquivées."}
+obj["OUTGOING_SPELL_PARRY"]					= { label="Parades compétences", tooltip="Afficher vos compétences parées."}
+obj["OUTGOING_SPELL_BLOCK"]					= { label="Bloquages compétences", tooltip="Afficher vos compétences bloquées."}
+obj["OUTGOING_SPELL_RESIST"]				= { label="Résistances aux sorts", tooltip="Afficher les résistances à vos sorts."}
+obj["OUTGOING_SPELL_ABSORB"]				= { label="Absorptions compétences", tooltip="Afficher les absorptions de dommages de vos compétences."}
+obj["OUTGOING_SPELL_IMMUNE"]				= { label="Immunités compétences", tooltip="Afficher les dommages de vos compétences auxquelles l'ennemi est immunisé."}
+obj["OUTGOING_SPELL_REFLECT"]				= { label="Compétences renvoyés", tooltip="Afficher les dommages de vos compétences qui vous sont renvoyés."}
+obj["OUTGOING_SPELL_INTERRUPT"]				= { label="Sorts interrompus", tooltip="Afficher les sorts qui sont interrompus."}
+obj["OUTGOING_SPELL_EVADE"]					= { label="Evites compétences", tooltip="Afficher les évites de vos compétences."}
+obj["OUTGOING_HEAL"]						= { label="Soins", tooltip="Afficher les soins effectués."}
+obj["OUTGOING_HEAL_CRIT"]					= { label="Soins critiques", tooltip="Afficher les soins critiques effectués."}
+obj["OUTGOING_HOT"]							= { label="Soins sur le temps (HoT)", tooltip="Afficher les soins sur le temps."}
+obj["OUTGOING_DISPEL"]						= { label="Dissipations", tooltip="Affiche les dissipations."}
+
+obj = L.OUTGOING_PET_EVENTS
+obj["PET_OUTGOING_DAMAGE"]						= { label="Mêlées", tooltip="Afficher les dommages infligés par votre familier."}
+obj["PET_OUTGOING_DAMAGE_CRIT"]					= { label="Mêlées critiques", tooltip="Afficher les dommages critiques infligés par votre familier."}
+obj["PET_OUTGOING_MISS"]						= { label="Manques de mêlée", tooltip="Afficher les attaques manquées par votre familier."}
+obj["PET_OUTGOING_DODGE"]						= { label="Esquives de mêlée", tooltip="Afficher les attaques de mêlée de votre familier esquivées."}
+obj["PET_OUTGOING_PARRY"]						= { label="Parades de mêlée", tooltip="Afficher les attaques de mêlée de votre familier parées."}
+obj["PET_OUTGOING_BLOCK"]						= { label="Bloquages de mêlée", tooltip="Afficher les attaques de mêlée de votre familier bloquées."}
+obj["PET_OUTGOING_ABSORB"]						= { label="Absorptions de mêlée", tooltip="Afficher les dommages en mêlée absorbés de votre familier."}
+obj["PET_OUTGOING_IMMUNE"]						= { label="Immunités de mêlée", tooltip="Afficher les capacités en mêlée de votre familier auxquelles l'ennemi est immunisé."}
+obj["PET_OUTGOING_EVADE"]						= { label="Evites de mêlée", tooltip="Afficher les evites en mêlée de votre familier."}
+obj["PET_OUTGOING_SPELL_DAMAGE"]				= { label="Compétences", tooltip="Afficher les dommages des compétences de votre familier."}
+obj["PET_OUTGOING_SPELL_DAMAGE_CRIT"]			= { label="Compétences critiques", tooltip="Afficher les dommages des compétences critiques de votre familier."}
+obj["PET_OUTGOING_SPELL_DOT"]					= { label="DoTs des compétences", tooltip="Afficher les dommages sur le temps (DoTs) des compétences de votre familier."}
+obj["PET_OUTGOING_SPELL_DOT_CRIT"]				= { label="DoTs critiques des compétences", tooltip="Afficher les dommages critiques sur le temps (DoTs) des compétences de votre familier."}
+obj["PET_OUTGOING_SPELL_DAMAGE_SHIELD"]			= { label="Dommages des boucliers", tooltip="Afficher les dommages fait par les boucliers de votre familier."}
+obj["PET_OUTGOING_SPELL_DAMAGE_SHIELD_CRIT"]	= { label="Dommages critiques des boucliers", tooltip="Afficher les dommages critiques fait par les boucliers de votre familier."}
+obj["PET_OUTGOING_SPELL_MISS"]					= { label="Manques compétences", tooltip="Afficher les compétences de votre familier qui ont manqué."}
+obj["PET_OUTGOING_SPELL_DODGE"]					= { label="Esquives compétences", tooltip="Afficher les compétences de votre familier qui ont été esquivées."}
+obj["PET_OUTGOING_SPELL_PARRY"]					= { label="Parades compétences", tooltip="Afficher les compétences de votre familier qui ont été parées."}
+obj["PET_OUTGOING_SPELL_BLOCK"]					= { label="Bloquages compétences", tooltip="Afficher les bloquages des compétences de votre familier."}
+obj["PET_OUTGOING_SPELL_RESIST"]				= { label="Résistances aux sorts", tooltip="Afficher les sorts de votre familier résisté."}
+obj["PET_OUTGOING_SPELL_ABSORB"]				= { label="Absorptions compétences", tooltip="Afficher les compétences de votre familier absorbés."}
+obj["PET_OUTGOING_SPELL_IMMUNE"]				= { label="Immunités compétences", tooltip="Afficher les compétences de votre familier auxquelles l'ennemi est immunisé."}
+obj["PET_OUTGOING_SPELL_EVADE"]					= { label="Evites compétences", tooltip="Afficher les évites des compétences de votre familier."}
+obj["PET_OUTGOING_DISPEL"]						= { label="Dissipations", tooltip="Affiche les dissipations de votre familier."}
+
+
+
+obj = L.NOTIFICATION_EVENTS
+obj["NOTIFICATION_DEBUFF"]				= { label="Debuffs", tooltip="Afficher les debuffs qui vous affectent."}
+obj["NOTIFICATION_DEBUFF_STACK"]		= { label="Pile des Debuff", tooltip="Afficher les piles des debuff qui vous affectent."}
+obj["NOTIFICATION_BUFF"]				= { label="Buffs", tooltip="Afficher les buffs reçus."}
+obj["NOTIFICATION_BUFF_STACK"]			= { label="Pile des Buff", tooltip="Afficher les piles des buff que vous recevez."}
+obj["NOTIFICATION_ITEM_BUFF"]			= { label="Buffs des objets", tooltip="Afficher les buffs reçus par les objets."}
+obj["NOTIFICATION_DEBUFF_FADE"]			= { label="Fin des debuffs", tooltip="Afficher la fin des debuffs."}
+obj["NOTIFICATION_BUFF_FADE"]			= { label="Fin des buffs", tooltip="Afficher la fin des buffs."}
+obj["NOTIFICATION_ITEM_BUFF_FADE"]		= { label="Fin des buffs d'objets", tooltip="Afficher quand un de vos buffs d'objet se termine."}
+obj["NOTIFICATION_COMBAT_ENTER"]		= { label="Début combat", tooltip="Afficher l'entrée en combat."}
+obj["NOTIFICATION_COMBAT_LEAVE"]		= { label="Sortie combat", tooltip="Afficher la fin du combat."}
+obj["NOTIFICATION_POWER_GAIN"]			= { label="Gains de puissance", tooltip="Afficher les gains de mana, rage et énergie."}
+obj["NOTIFICATION_POWER_LOSS"]			= { label="Pertes de puissance", tooltip="Afficher les pertes de mana, rage et énergie par des drains."}
+obj["NOTIFICATION_CP_GAIN"]				= { label="Gain de points de combo", tooltip="Afficher les points de combo."}
+obj["NOTIFICATION_CP_FULL"]				= { label="5 points de combo", tooltip="Afficher quand vous avez atteint 5 points de combo."}
+obj["NOTIFICATION_HONOR_GAIN"]			= { label="Gains d'honneur", tooltip="Afficher les gains d'honneur."}
+obj["NOTIFICATION_REP_GAIN"]			= { label="Gains de réputation", tooltip="Afficher les gains de réputation."}
+obj["NOTIFICATION_REP_LOSS"]			= { label="Pertes de réputation", tooltip="Afficher les pertes de réputation."}
+obj["NOTIFICATION_SKILL_GAIN"]			= { label="Progression de compétences", tooltip="Afficher les progressions de compétences."}
+obj["NOTIFICATION_EXPERIENCE_GAIN"]		= { label="Gains d'expérience", tooltip="Afficher les gains d'expérience."}
+obj["NOTIFICATION_PC_KILLING_BLOW"]		= { label="Coups fatals sur un joueur", tooltip="Afficher vos coups fatals sur les joueurs ennemis."}
+obj["NOTIFICATION_NPC_KILLING_BLOW"]	= { label="Coups fatals sur un PNJ", tooltip="Afficher vos coups fatals sur les personnages non joueurs ennemis."}
+obj["NOTIFICATION_EXTRA_ATTACK"]		= { label="Attaques supplémentaires", tooltip="Afficher les gains d'attaques supplémentaires, comme Windfury, etc."}
+obj["NOTIFICATION_ENEMY_BUFF"]			= { label="Gains de buff ennemi", tooltip="Affiche les buffs que gagne votre ennemi ciblé."}
+obj["NOTIFICATION_MONSTER_EMOTE"]		= { label="Emote des monstres", tooltip="Affiche les emotes du monstre que vous ciblez."}
+
+
+
+obj = L.OUTLINES
+obj[1] = "Aucun"
+obj[2] = "Fin"
+obj[3] = "Epais"
+
+obj = L.TEXT_ALIGNS
+obj[1] = "Gauche"
+obj[2] = "Centre"
+obj[3] = "Droite"
+
+
+
+
+
+
+obj = L.ANIMATION_STYLE_DATA
+obj["Angled"]		= "En Angle"
+obj["Horizontal"]	= "Horizontal"
+obj["Parabola"]		= "Parabole"
+obj["Straight"]		= "Directement"
+obj["Static"]		= "Statique"
+obj["Pow"]			= "Pow"
+
+obj["Alternate"]	= "Alternée"
+obj["Left"]			= "Gauche"
+obj["Right"]		= "Droite"
+obj["Up"]			= "Haut"
+obj["Down"]			= "Bas"
+
+obj["AngleUp"]		= "En Angle vers le Haut"
+obj["AngleDown"]	= "En Angle vers le Bas"
+obj["GrowUp"]		= "Développement vers le Haut"
+obj["GrowDown"]		= "Développement vers le Bas"
+obj["CurvedLeft"]	= "Incurvé à Gauche"
+obj["CurvedRight"]	= "Incurvé à Droite"
+obj["Jiggle"]		= "Secoué"
+obj["Normal"]		= "Normal"
+
+L.MSG_INVALID_CUSTOM_SOUND_NAME		= "Nom du Son incorrect."
+L.MSG_SOUND_NAME_ALREADY_EXISTS		= "Le nom du son existe déjà."
+L.MSG_INVALID_SOUND_FILE			= "Le fichier son doit être au format .ogg."
+L.CHECKBOXES["enableSounds"]			= { label="Activer les sons", tooltip="Jouer les sons associés aux évènements et déclencheurs."}
+L.DROPDOWNS["sound"]				= { label="Son:", tooltip="Sélectionne le son à jouer quand un évènement intervient."}
+L.BUTTONS["addCustomSound"]			= { label="Ajouter un Son", tooltip="Ajoute un son personnalisé à la liste des sons disponibles.\n\nATTENTION: Le fichier son doit exister *AVANT* que WoW n'est démarré.\n\nIl est fortement recommandé de placer ce fichier dans le répertoire MikScrollingBattleText\\Sounds pour éviter tout problème."}
+L.BUTTONS["customSound"]				= { tooltip="Cliquer pour saisir un fichier son personnalisé." }
+L.BUTTONS["playSound"]				= { label="Jouer", tooltip="Cliquer pour jouer le son."}
+L.EDITBOXES["customSoundName"]	= { label="Nom du Son:", tooltip="Le nom utilisé pour identifier le son.\n\nExemple: Mon Son"}
+L.EDITBOXES["customSoundPath"]	= { label="Chemin du Son:", tooltip="Le chemin qui pointe vers le fichier du son.\n\nNOTE: Si le fichier est situé dans le répertoire rcommandé MikScrollingBattleText\\Sounds, seul le nom de fichier doit être entré ici, au lieu du chemin complet.\n\nExemple: monSon.ogg"}
+L.EDITBOXES["soundFile"]		= { label="Nom du fichier son:", tooltip="le nom du fichier son à joueur quand l'évènement intervient."}
